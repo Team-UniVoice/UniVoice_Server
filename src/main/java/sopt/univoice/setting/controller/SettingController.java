@@ -16,7 +16,10 @@ import java.net.URI;
 public class SettingController {
     private final SettingService settingService;
 
-
+    @GetMapping("/test")
+    public String test() {
+        return "테스트 API 입니다!";
+    }
 
     @PostMapping
     public ResponseEntity createMember(
