@@ -30,7 +30,6 @@ jobs:
     - name: make application.yml
       run: |
         ## create application.yml
-        mkdir ./src/main/resources
         cd ./src/main/resources
 
         touch ./application.yml
