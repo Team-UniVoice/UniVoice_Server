@@ -18,7 +18,7 @@ public class SettingController {
 
     @GetMapping("/test")
     public String test() {
-        return "테스트 API 입니다!";
+        return "테스트 API 입니다! + CD 테스트 !! ";
     }
 
     @PostMapping
