@@ -9,7 +9,7 @@ import sopt.univoice.domain.universityData.service.UniversityDataService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api1/universityData")
+@RequestMapping("/api/v1/universityData")
 @RequiredArgsConstructor
 public class UniversityDataController {
 
