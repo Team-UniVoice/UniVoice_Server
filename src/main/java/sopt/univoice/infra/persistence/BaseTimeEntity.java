@@ -1,4 +1,4 @@
-package sopt.univoice.config;
+package sopt.univoice.infra.persistence;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
