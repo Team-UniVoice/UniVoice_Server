@@ -1,12 +1,12 @@
 package sopt.univoice.infra.common.dto;
 
-public record SuccessStatusResponse(
+public record SuccessStatusResponse<T>(
         int status,
-        String message
+        String message,
+        T data
 ) {
 
-    public static SuccessStatusResponse of(SuccessMessage successMessage) {
-        return new SuccessStatusResponse(successMessage.getStatus(), successMessage.getMessage());
+    public static <T> SuccessStatusResponse<T> of(SuccessMessage successMessage, T data) {
+        return new SuccessStatusResponse<>(successMessage.getStatus(), successMessage.getMessage(), data);
     }
-
 }

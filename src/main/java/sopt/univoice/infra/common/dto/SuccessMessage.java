@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum SuccessMessage {
 
-    UNIVERSITY_GET_SUCCESS(HttpStatus.CREATED.value(),"대학교이름 조회에 성공하였습니다."),
+    UNIVERSITY_GET_SUCCESS(HttpStatus.OK.value(),"대학교이름 조회에 성공하였습니다."),
     ;
     private final int status;
     private final String message;
