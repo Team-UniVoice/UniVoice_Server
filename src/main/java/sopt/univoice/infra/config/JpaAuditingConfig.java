@@ -1,4 +1,4 @@
-package sopt.univoice.config;
+package sopt.univoice.infra.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
