@@ -1,4 +1,5 @@
-package sopt.univoice.external;
+package sopt.univoice.infra.external;
+
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import sopt.univoice.infra.config.AwsConfig;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -35,11 +37,11 @@ public class S3Service {
         validateFileSize(image);
 
         PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .contentType(image.getContentType())
-                .contentDisposition("inline")
-                .build();
+                                       .bucket(bucketName)
+                                       .key(key)
+                                       .contentType(image.getContentType())
+                                       .contentDisposition("inline")
+                                       .build();
 
         RequestBody requestBody = RequestBody.fromBytes(image.getBytes());
         s3Client.putObject(request, requestBody);
@@ -50,9 +52,9 @@ public class S3Service {
         final S3Client s3Client = awsConfig.getS3Client();
 
         s3Client.deleteObject((DeleteObjectRequest.Builder builder) ->
-                builder.bucket(bucketName)
-                        .key(key)
-                        .build()
+                                  builder.bucket(bucketName)
+                                      .key(key)
+                                      .build()
         );
     }
 

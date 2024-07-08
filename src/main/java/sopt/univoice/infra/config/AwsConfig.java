@@ -1,4 +1,4 @@
-package sopt.univoice.external;
+package sopt.univoice.infra.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,8 +41,8 @@ public class AwsConfig {
     @Bean
     public S3Client getS3Client() {
         return S3Client.builder()
-                .region(getRegion())
-                .credentialsProvider(systemPropertyCredentialsProvider())
-                .build();
+                   .region(getRegion())
+                   .credentialsProvider(systemPropertyCredentialsProvider())
+                   .build();
     }
 }
