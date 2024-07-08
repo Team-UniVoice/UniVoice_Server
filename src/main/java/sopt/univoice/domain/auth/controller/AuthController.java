@@ -15,6 +15,7 @@ import sopt.univoice.infra.common.exception.message.BusinessException;
 import sopt.univoice.infra.common.exception.message.ErrorMessage;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -40,6 +41,22 @@ public class AuthController {
                 .body(SuccessStatusResponse.of(SuccessMessage.SIGNUP_SUCCESS, null));
     }
 
+
+
+
+    @PostMapping("/slack/actions")
+    public void handleSlackActions(@RequestBody Map<String, Object> payload) {
+        List<Map<String, Object>> actions = (List<Map<String, Object>>) payload.get("actions");
+        String actionId = (String) actions.get(0).get("action_id");
+
+        if ("approve_action".equals(actionId)) {
+            // 승인 처리 로직
+            System.out.println("승인 버튼 클릭됨");
+        } else if ("reject_action".equals(actionId)) {
+            // 거절 처리 로직
+            System.out.println("거절 버튼 클릭됨");
+        }
+    }
 
 
 

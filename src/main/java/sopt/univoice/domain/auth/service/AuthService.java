@@ -2,6 +2,7 @@ package sopt.univoice.domain.auth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.slack.api.Slack;
+import com.slack.api.model.block.LayoutBlock;
 import com.slack.api.webhook.Payload;
 import com.slack.api.webhook.WebhookResponse;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,16 @@ import sopt.univoice.domain.universityData.repository.DepartmentRepository;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.infra.external.S3Service;
 
+import com.slack.api.model.block.Blocks;
+import com.slack.api.model.block.composition.BlockCompositions;
+import com.slack.api.model.block.element.BlockElements;
+
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
+
+import static com.slack.api.model.block.composition.BlockCompositions.plainText;
+import static com.slack.api.model.block.element.BlockElements.asElements;
 
 @Service
 @RequiredArgsConstructor
@@ -97,9 +106,17 @@ public class AuthService {
                 member.getDepartmentName()
         );
 
+        List<LayoutBlock> blocks = Arrays.asList(
+                Blocks.section(section -> section.text(BlockCompositions.markdownText(formattedMessage))),
+                Blocks.actions(actions -> actions.elements(asElements(
+                        BlockElements.button(b -> b.text(plainText(pt -> pt.text("승인"))).value("approve").actionId("approve_action")),
+                        BlockElements.button(b -> b.text(plainText(pt -> pt.text("거절"))).value("reject").actionId("reject_action"))
+                )))
+        );
+
         try {
             Payload payload = Payload.builder()
-                    .text(formattedMessage)
+                    .blocks(blocks)
                     .build();
             WebhookResponse response = slack.send(WEBHOOK_URL, payload);
             System.out.println(response);
