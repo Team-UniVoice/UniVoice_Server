@@ -54,4 +54,14 @@ public class NoticeService {
         noticeImages.forEach(image -> image.setNotice(notice));
         return NoticeRegisterResponseDto.of(noticeRepository.save(notice));
     }
+
+    @Transactional
+    public List<String> uploadImages(List<MultipartFile> files) throws IOException { // 이미지 S3에 업로드하기 위한 로직
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile file : files) {
+            String imageUrl = s3Service.uploadImage("notice-images/", file);
+            imageUrls.add(imageUrl);
+        }
+        return imageUrls;
+    }
 }

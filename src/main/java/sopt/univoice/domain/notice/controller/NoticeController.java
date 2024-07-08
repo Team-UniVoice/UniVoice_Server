@@ -11,12 +11,10 @@ import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
 import sopt.univoice.domain.notice.service.NoticeService;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
+import sopt.univoice.infra.common.exception.message.ErrorMessage;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/api/v1/notice")
@@ -25,6 +23,18 @@ public class NoticeController {
 
     private final NoticeService noticeService;
     private static final String ACCESS_TOKEN = "access-token";
+
+    @PostMapping("/upload")
+    public ResponseEntity<SuccessStatusResponse<List<String>>> uploadImages(@RequestParam("files") List<MultipartFile> files) {
+        try {
+            List<String> imageUrls = noticeService.uploadImages(files);
+            return ResponseEntity.status(HttpStatus.OK)
+                       .body(SuccessStatusResponse.of(SuccessMessage.UPLOAD_SUCCESS, imageUrls));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                       .body(SuccessStatusResponse.of(ErrorMessage.UPLOAD_FAILED, null));
+        }
+    }
 
     @PostMapping
     public ResponseEntity<SuccessStatusResponse<NoticeRegisterResponseDto>> registerNotice(@RequestHeader("Authorization") String accessToken, @RequestBody NoticeRegisterRequestDto noticeRegisterRequestDto) {
