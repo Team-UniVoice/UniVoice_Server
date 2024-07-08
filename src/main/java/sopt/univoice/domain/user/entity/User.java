@@ -6,7 +6,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import sopt.univoice.domain.affiliation.entity.Affiliation;
+import sopt.univoice.domain.notice.entity.Notice;
+import sopt.univoice.domain.notice.entity.NoticeImage;
 import sopt.univoice.infra.persistence.BaseTimeEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -47,6 +53,13 @@ public class User extends BaseTimeEntity {
 
     @Column(name = "department_name", nullable = false)
     private String departmentName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "affiliation_idx")
+    private Affiliation affiliation;
+
+    @OneToMany(mappedBy = "user")
+    private List<Notice> notices = new ArrayList<>();
 
     @Builder
     public User(Integer admissionNumber, String name, Integer studentNumber, String email, String password, String studentCardImage, String universityName, String collegeDepartmentName, String departmentName) {

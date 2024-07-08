@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sopt.univoice.domain.notice.dto.request.NoticeRegisterRequestDto;
+import sopt.univoice.domain.notice.dto.response.NoticeGetResponseDto;
 import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.entity.NoticeImage;
@@ -64,4 +65,20 @@ public class NoticeService {
         }
         return imageUrls;
     }
+
+    @Transactional
+    public NoticeGetResponseDto getNotice(Long noticeIdx) {
+
+        Notice notice = noticeRepository.findByIdOrThrow(noticeIdx);
+
+        // 추후 유저 가입이 구현되면 그때 소속 관련 정보 구현할 계획 !
+        // -> 소속이 공지에서 유저 찾고, 유저에서 소속찾는 게 복잡해서
+
+        List<String> imageList = notice.getNoticeImages().stream()
+                                     .map(NoticeImage::getNoticeImage)
+                                     .collect(Collectors.toList());
+
+        return NoticeGetResponseDto.of(notice, imageList);
+    }
 }
+
