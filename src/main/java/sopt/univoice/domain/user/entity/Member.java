@@ -1,6 +1,7 @@
 package sopt.univoice.domain.user.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sopt.univoice.domain.affiliation.entity.Affiliation;
@@ -37,7 +38,17 @@ public class Member extends BaseTimeEntity {
     @JoinColumn(name = "affiliation_id")
     private Affiliation affiliation;
 
-
+    @Builder
+    public Member(Long admissionNumber, String name, String studentNumber, String email, String password, String studentCardImage, String universityName, String departmentName) {
+        this.admissionNumber = admissionNumber;
+        this.name = name;
+        this.studentNumber = studentNumber;
+        this.email = email;
+        this.password = password;
+        this.studentCardImage = studentCardImage;
+        this.universityName = universityName;
+        this.departmentName = departmentName;
+    }
 
 
 }

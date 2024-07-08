@@ -33,21 +33,12 @@ public class AuthController {
         }
     }
 
-
     @PostMapping("/signup")
     public ResponseEntity<SuccessStatusResponse<Void>> signUp(@ModelAttribute MemberCreateRequest memberCreateRequest) {
-
-
-
-
-
+        authService.signUp(memberCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(SuccessStatusResponse.of(SuccessMessage.SIGNUP_SUCCESS, null));
     }
-
-
-
-
-
-
 
 
 
