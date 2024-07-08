@@ -1,5 +1,9 @@
 package sopt.univoice.domain.auth.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.slack.api.Slack;
+import com.slack.api.webhook.Payload;
+import com.slack.api.webhook.WebhookResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +24,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuthService {
 
+    final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
+    private static final String S3_BUCKET_URL = "https://uni-voice-bucket.s3.ap-northeast-2.amazonaws.com/";
+
 
     private final AuthRepository authRepository;
     private final S3Service s3Service;
     private final DepartmentRepository departmentRepository;
     private final CollegeDepartmentRepository collegeDepartmentRepository;
+    private final ObjectMapper objectMapper;
 
     public boolean isDuplicateEmail(CheckEmailRequest checkEmailRequest) {
         return authRepository.existsByEmail(checkEmailRequest.getEmail());
@@ -33,6 +41,8 @@ public class AuthService {
 
     @Transactional
     public void signUp(MemberCreateRequest memberCreateRequest) {
+
+        Slack slack = Slack.getInstance();
         String imageUrl = null;
         try {
             imageUrl = s3Service.uploadImage("student-card-images/", memberCreateRequest.getStudentCardImage());
@@ -40,16 +50,13 @@ public class AuthService {
             throw new RuntimeException("이미지 업로드에 실패했습니다.", e);
         }
 
-        // departmentName을 통해 department 엔티티를 찾음
         List<Department> departments = departmentRepository.findByDepartmentName(memberCreateRequest.getDepartmentName());
         if (departments.isEmpty()) {
             throw new RuntimeException("해당 학과가 존재하지 않습니다.");
         }
 
-        // 적절한 department 선택 (예: 첫 번째 결과 사용)
         Department department = departments.get(0);
 
-        // department 엔티티를 통해 collegeDepartment 엔티티를 찾음
         CollegeDepartment collegeDepartment = collegeDepartmentRepository.findById(department.getCollegeDepartment().getId())
                 .orElseThrow(() -> new RuntimeException("해당 단과대학이 존재하지 않습니다."));
 
@@ -66,6 +73,39 @@ public class AuthService {
                 .build();
 
         authRepository.save(member);
+
+
+        String formattedMessage = String.format(
+                "새로운 회원 가입:\n" +
+                        "\"admissionNumber\" : %d\n" +
+                        "\"name\" : \"%s\"\n" +
+                        "\"studentNumber\" : \"%s\"\n" +
+                        "\"email\" : \"%s\"\n" +
+                        "\"password\" : \"%s\"\n" +
+                        "\"studentCardImage\" : \"%s\"\n" +
+                        "\"universityName\" : \"%s\"\n" +
+                        "\"collegeDepartmentName\" : \"%s\"\n" +
+                        "\"departmentName\" : \"%s\"",
+                member.getAdmissionNumber(),
+                member.getName(),
+                member.getStudentNumber(),
+                member.getEmail(),
+                member.getPassword(),
+                S3_BUCKET_URL + member.getStudentCardImage(),
+                member.getUniversityName(),
+                member.getCollegeDepartmentName(),
+                member.getDepartmentName()
+        );
+
+        try {
+            Payload payload = Payload.builder()
+                    .text(formattedMessage)
+                    .build();
+            WebhookResponse response = slack.send(WEBHOOK_URL, payload);
+            System.out.println(response);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
