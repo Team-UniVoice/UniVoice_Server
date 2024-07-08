@@ -1,5 +1,7 @@
 package sopt.univoice.infra.common.dto;
 
+import java.util.Map;
+
 public record SuccessStatusResponse<T>(
     int status,
     String message,
@@ -10,5 +12,9 @@ public record SuccessStatusResponse<T>(
     }
     public static SuccessStatusResponse<Void> of(SuccessMessage successMessage) {
         return new SuccessStatusResponse<>(successMessage.getStatus(), successMessage.getMessage(), null);
+    }
+
+    public static <T> SuccessStatusResponse<Map<String, T>> of(SuccessMessage successMessage, String key, T data) {
+        return new SuccessStatusResponse<>(successMessage.getStatus(), successMessage.getMessage(), Map.of(key, data));
     }
 }

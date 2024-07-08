@@ -45,7 +45,8 @@ public class S3Service {
 
         RequestBody requestBody = RequestBody.fromBytes(image.getBytes());
         s3Client.putObject(request, requestBody);
-        return key;
+
+        return generatePresignedUrl(key);
     }
 
     public void deleteImage(String key) throws IOException {
@@ -58,6 +59,9 @@ public class S3Service {
         );
     }
 
+    private String generatePresignedUrl(String key) {
+        return "https://" + bucketName + ".s3.amazonaws.com/" + key;
+    }
 
     private String generateImageFileName() {
         return UUID.randomUUID() + ".jpg";

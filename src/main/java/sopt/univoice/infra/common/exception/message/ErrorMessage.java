@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 public enum ErrorMessage {
-
+    NOT_FOUND_USER(HttpStatus.NO_CONTENT.value(), "ID에 해당하는 사용자가 없습니다.")
     ;
     private final int status;
     private final String message;
