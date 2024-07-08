@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sopt.univoice.domain.auth.dto.CheckEmailRequest;
+import sopt.univoice.domain.auth.dto.MemberCreateRequest;
 import sopt.univoice.domain.auth.service.AuthService;
 import sopt.univoice.domain.universityData.dto.UniversityNameRequest;
 import sopt.univoice.infra.common.dto.SuccessMessage;
@@ -30,6 +31,16 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(SuccessStatusResponse.of(SuccessMessage.EMAIL_AVAILABLE));
         }
+    }
+
+
+    @PostMapping("/signup")
+    public ResponseEntity<SuccessStatusResponse<Void>> signUp(@ModelAttribute MemberCreateRequest memberCreateRequest) {
+
+
+
+
+
     }
 
 
