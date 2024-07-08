@@ -26,4 +26,9 @@ public class Department {
     @JoinColumn(name = "university_id")
     private University university;
 
+
+    public Long getCollegeDepartmentId() {
+        return this.collegeDepartment.getId();
+    }
+
 }

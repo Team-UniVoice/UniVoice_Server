@@ -6,5 +6,6 @@ import sopt.univoice.domain.universityData.entity.Department;
 import java.util.List;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
+    List<Department> findByDepartmentName(String departmentName);
     List<Department> findByUniversityId(Long universityId);
 }
