@@ -10,6 +10,8 @@ import sopt.univoice.domain.auth.service.AuthService;
 import sopt.univoice.domain.universityData.dto.UniversityNameRequest;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
+import sopt.univoice.infra.common.exception.message.BusinessException;
+import sopt.univoice.infra.common.exception.message.ErrorMessage;
 
 import java.util.List;
 
@@ -23,8 +25,7 @@ public class AuthController {
     public ResponseEntity<SuccessStatusResponse<Void>> checkEmail(@RequestBody CheckEmailRequest checkEmailRequest) {
         boolean isDuplicate = authService.isDuplicateEmail(checkEmailRequest);
         if (isDuplicate) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(SuccessStatusResponse.of(SuccessMessage.EMAIL_DUPLICATE));
+            throw new BusinessException(ErrorMessage.EMAIL_DUPLICATE);
         } else {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(SuccessStatusResponse.of(SuccessMessage.EMAIL_AVAILABLE));

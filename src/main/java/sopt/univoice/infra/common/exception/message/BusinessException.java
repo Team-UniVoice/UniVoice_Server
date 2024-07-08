@@ -1,4 +1,4 @@
-package sopt.univoice.infra.common.exception;
+package sopt.univoice.infra.common.exception.message;
 
 import sopt.univoice.infra.common.exception.message.ErrorMessage;
 
@@ -9,4 +9,10 @@ public class BusinessException extends RuntimeException {
         super(errorMessage.getMessage());
         this.errorMessage = errorMessage;
     }
+
+
+    public ErrorMessage getErrorMessage() {
+        return errorMessage;
+    }
+
 }
