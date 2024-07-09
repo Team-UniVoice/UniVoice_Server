@@ -1,4 +1,4 @@
-# UniVoice_Server - 유니보이스
+# UniVoice_Server
 > 학생회와 일반 학생들의 목소리를 들으며 함께 만들어가는 대학 생활 필수 앱
 
 ![image](https://github.com/Team-UniVoice/UniVoice_Server/assets/137388764/7b8e3956-5059-4f6b-8db3-442341558f02)
