@@ -50,6 +50,8 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> {
                     auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
+                    auth.requestMatchers("/api/v1/posts").hasAnyRole("APPROVEUSER", "APPROVEADMIN");
+                    auth.requestMatchers("/api/v1/posts/**").hasRole("APPROVEADMIN");
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

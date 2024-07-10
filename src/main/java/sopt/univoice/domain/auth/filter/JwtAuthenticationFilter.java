@@ -18,6 +18,7 @@ import sopt.univoice.infra.common.jwt.JwtTokenProvider;
 import sopt.univoice.infra.common.jwt.JwtValidationType;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -49,9 +50,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String token = getJwtFromRequest(request);
-            if (token != null && jwtTokenProvider.validateToken(token) == JwtValidationType.VALID_JWT) {
-                Long memberId = jwtTokenProvider.getUserFromJwt(token);
-                UserAuthentication authentication = UserAuthentication.createUserAuthentication(memberId);
+            if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token) == JwtValidationType.VALID_JWT) {
+                Long userId = jwtTokenProvider.getUserFromJwt(token);
+                Collection authorities = jwtTokenProvider.getAuthoritiesFromJwt(token);
+
+                UserAuthentication authentication = new UserAuthentication(userId, null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
@@ -60,6 +63,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
+
+
+
+
+
+
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");

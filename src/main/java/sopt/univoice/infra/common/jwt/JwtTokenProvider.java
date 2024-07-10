@@ -7,10 +7,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
+
+
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -18,6 +25,7 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private static final String USER_ID = "userId";
+    private static final String ROLES = "roles";
 
     private static final Long ACCESS_TOKEN_EXPIRATION_TIME = 24 * 60 * 60 * 1000L * 14;
 
@@ -40,6 +48,9 @@ public class JwtTokenProvider {
 
         // Claim에는 token 생성시간과 만료시간, 그리고 사용자 인증 정보가 들어간다.
         claims.put(USER_ID, authentication.getPrincipal());
+        claims.put(ROLES, authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
 
         //헤더 타입을 설정해주는 Header Param, Claim 을 이용한 정보를 대상으로 암호화하여 Jwt 토큰을 만들어 반환.
         return Jwts.builder()
@@ -83,4 +94,15 @@ public class JwtTokenProvider {
         Claims claims = getBody(token);
         return Long.valueOf(claims.get(USER_ID).toString());
     }
+
+
+    public Collection<? extends GrantedAuthority> getAuthoritiesFromJwt(String token) {
+        Claims claims = getBody(token);
+        List<String> roles = claims.get(ROLES, List.class);
+        return roles.stream()
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
+    }
+
+
 }
