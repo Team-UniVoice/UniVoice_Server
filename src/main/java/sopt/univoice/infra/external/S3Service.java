@@ -1,4 +1,4 @@
-package sopt.univoice.external;
+package sopt.univoice.infra.external;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -7,6 +7,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import sopt.univoice.infra.config.AwsConfig;
 
 import java.io.IOException;
 import java.util.Arrays;

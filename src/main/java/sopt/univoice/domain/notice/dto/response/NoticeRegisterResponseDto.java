@@ -8,6 +8,6 @@ public record NoticeRegisterResponseDto(
     Long noticeIdx
 ) {
     public static NoticeRegisterResponseDto of(Notice notice) {
-        return new NoticeRegisterResponseDto(notice.getNoticeIdx());
+        return new NoticeRegisterResponseDto(notice.getId());
     }
 }

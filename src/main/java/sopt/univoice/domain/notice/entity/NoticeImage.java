@@ -12,8 +12,8 @@ public class NoticeImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notice_image_idx")
-    private Long noticeImageIdx;
+    @Column(name = "notice_image_id")
+    private Long id;
 
     @Column(name = "notice_image", length = 255)
     private String noticeImage;

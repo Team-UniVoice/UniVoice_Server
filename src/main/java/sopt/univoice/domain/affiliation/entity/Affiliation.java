@@ -18,6 +18,7 @@ import java.util.List;
 public class Affiliation extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "affiliation_id")
     private Long id;
 
     private String role;
