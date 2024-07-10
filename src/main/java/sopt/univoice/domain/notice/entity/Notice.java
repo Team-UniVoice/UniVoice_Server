@@ -5,9 +5,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sopt.univoice.domain.user.entity.User;
+import sopt.univoice.domain.user.entity.Member;
 
-import java.awt.print.Book;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +47,8 @@ public class Notice {
     private String category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_idx")
-    private User user;
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NoticeImage> noticeImages = new ArrayList<>();
@@ -59,7 +58,7 @@ public class Notice {
     }
 
     @Builder
-    public Notice(String title, String content, Integer noticeLike, Integer viewCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, User user, List<NoticeImage> noticeImages) {
+    public Notice(String title, String content, Integer noticeLike, Integer viewCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, Member member, List<NoticeImage> noticeImages) {
         this.title = title;
         this.content = content;
         this.noticeLike = noticeLike;
@@ -68,11 +67,11 @@ public class Notice {
         this.startTime = startTime;
         this.endTime = endTime;
         this.category = category;
-        this.user = user;
+        this.member = member;
         this.noticeImages = noticeImages;
     }
 
-    public static Notice of(String title, String content, Integer noticeLike, Integer viewCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, User user, List<NoticeImage> noticeImages) {
-        return new Notice(title, content, noticeLike, viewCount, target, startTime, endTime, category, user, noticeImages);
+    public static Notice of(String title, String content, Integer noticeLike, Integer viewCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, Member member, List<NoticeImage> noticeImages) {
+        return new Notice(title, content, noticeLike, viewCount, target, startTime, endTime, category, member, noticeImages);
     }
 }

@@ -9,7 +9,7 @@ import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.entity.NoticeImage;
 import sopt.univoice.domain.notice.repository.NoticeRepository;
-import sopt.univoice.domain.user.entity.User;
+import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.user.repository.UserRepository;
 import sopt.univoice.infra.external.S3Service;
 
@@ -29,7 +29,7 @@ public class NoticeService {
     @Transactional
     public NoticeRegisterResponseDto registerNotice(NoticeRegisterRequestDto noticeRegisterRequestDto) {
 
-        User user = userRepository.findByIdOrThrow(1L); // 아직 accessToken부분이 구현이 안되어서 임시로 사용자 id 설정함
+        Member member = userRepository.findByIdOrThrow(1L); // 아직 accessToken부분이 구현이 안되어서 임시로 사용자 id 설정함
         // 나중에 accessToken에서 사용자 id를 추출하는 코드 구현해서 Long id를 파라미터로 받아올 듯
 
         List<NoticeImage> noticeImages = noticeRegisterRequestDto.noticeImage().stream()
@@ -45,7 +45,7 @@ public class NoticeService {
                             .startTime(noticeRegisterRequestDto.startTime())
                             .endTime(noticeRegisterRequestDto.endTime())
                             .category("공지사항")
-                            .user(user)
+                            .member(member)
                             .noticeLike(0)
                             .viewCount(0)
                             .noticeImages(noticeImages)

@@ -2,9 +2,6 @@ package sopt.univoice.domain.notice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import sopt.univoice.domain.user.entity.User;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter

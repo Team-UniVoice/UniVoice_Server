@@ -26,8 +26,17 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'com.slack.api:slack-api-client:1.30.0'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.0' // 최신 버전으로 업데이트
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.14.0'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.14.0'
+
+
+
 	implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
 	implementation("software.amazon.awssdk:bom:2.21.0")
 	implementation("software.amazon.awssdk:s3:2.21.0")
