@@ -31,11 +31,11 @@ public class NoticeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.POST_NOTICE_SUCCESS, noticeService.registerNotice(noticeRegisterRequestDto, files)));
     }
 
-    @GetMapping("/{noticeIdx}")
-    public ResponseEntity<SuccessStatusResponse<NoticeGetResponseDto>> getNotice(@RequestHeader("Authorization") String accessToken, @PathVariable Long noticeIdx) {
+    @GetMapping("/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<NoticeGetResponseDto>> getNotice(@RequestHeader("Authorization") String accessToken, @PathVariable Long noticeId) {
         if (!ACCESS_TOKEN.equals(accessToken)) { // 아직 accessToken이 없어서 임시로 검증하는 부분
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.GET_NOICE_SUCCESS, noticeService.getNotice(noticeIdx)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.GET_NOICE_SUCCESS, noticeService.getNotice(noticeId)));
     }
 }

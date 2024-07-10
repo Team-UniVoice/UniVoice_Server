@@ -28,11 +28,14 @@ public class Affiliation extends BaseTimeEntity {
 
     private String affiliationName;
 
-    private String affiliation;
+    private String affiliation; // 0.NULl 미승인 / 1. 일반/ 2. 학생회 / 3. 단과대학 / 4. 총학생회
 
     private String affiliationCardImage;
 
     private String affiliationLogoImage;
+
+    @OneToMany(mappedBy = "affiliation")
+    private List<Member> members = new ArrayList<>();
 
 
     @Builder

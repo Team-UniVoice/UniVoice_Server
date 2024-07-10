@@ -11,11 +11,10 @@ import sopt.univoice.infra.persistence.BaseTimeEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(schema = "public")
+@Table(name = "member", schema = "public")
 public class Member extends BaseTimeEntity {
 
     @Id
@@ -23,22 +22,28 @@ public class Member extends BaseTimeEntity {
     @Column(name = "member_id")
     private Long id;
 
-    private  Long admissionNumber;
+    @Column(name = "admission_number")
+    private Long admissionNumber;
 
     private String name;
 
+    @Column(name = "student_number")
     private String studentNumber;
 
     private String email;
 
     private String password;
 
+    @Column(name = "student_card_image")
     private String studentCardImage;
 
-    private String  universityName;
+    @Column(name = "university_name")
+    private String universityName;
 
+    @Column(name = "college_department_name")
     private String collegeDepartmentName;
 
+    @Column(name = "department_name")
     private String departmentName;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,14 +54,14 @@ public class Member extends BaseTimeEntity {
     private List<Notice> notices = new ArrayList<>();
 
     @Builder
-    public Member(Long admissionNumber, String name, String studentNumber, String email, String password, String studentCardImage,String collegeDepartmentName, String universityName, String departmentName) {
+    public Member(Long admissionNumber, String name, String studentNumber, String email, String password, String studentCardImage, String collegeDepartmentName, String universityName, String departmentName) {
         this.admissionNumber = admissionNumber;
         this.name = name;
         this.studentNumber = studentNumber;
         this.email = email;
         this.password = password;
         this.studentCardImage = studentCardImage;
-        this.collegeDepartmentName=collegeDepartmentName;
+        this.collegeDepartmentName = collegeDepartmentName;
         this.universityName = universityName;
         this.departmentName = departmentName;
     }

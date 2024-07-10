@@ -16,7 +16,6 @@ import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.external.S3Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,18 +67,27 @@ public class NoticeService {
     }
 
     @Transactional
-    public NoticeGetResponseDto getNotice(Long noticeIdx) {
+    public NoticeGetResponseDto getNotice(Long noticeId) {
 
-        Notice notice = noticeRepository.findByIdOrThrow(noticeIdx);
+        Notice notice = noticeRepository.findByIdOrThrow(noticeId);
 
-        // 추후 유저 가입이 구현되면 그때 소속 관련 정보 구현할 계획 !
-        // -> 소속이 공지에서 유저 찾고, 유저에서 소속찾는 게 복잡해서
+        Member member = userRepository.findByIdOrThrow(1L);
+
+        // 소속명 설정
+        String writeAffiliation;
+        if ("총학생회".equals(member.getAffiliation().getAffiliation())) {
+            writeAffiliation = member.getAffiliation().getAffiliationName() + " 총 학생회";
+        } else if ("단과대학".equals(member.getAffiliation().getAffiliation()) || "학생회".equals(member.getAffiliation().getAffiliation())) {
+            writeAffiliation = member.getAffiliation().getAffiliationName() + " 학생회";
+        } else {
+            writeAffiliation = "소속을 찾을 수 없습니다";
+        }
 
         List<String> imageList = notice.getNoticeImages().stream()
                                      .map(NoticeImage::getNoticeImage)
                                      .collect(Collectors.toList());
 
-        return NoticeGetResponseDto.of(notice, imageList);
+        return NoticeGetResponseDto.of(notice, writeAffiliation, imageList);
+
     }
 }
-

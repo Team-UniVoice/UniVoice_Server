@@ -6,7 +6,8 @@ import sopt.univoice.domain.notice.entity.Notice;
 
 public record NoticeGetResponseDto(
 
-    Long noticeIdx,
+    Long noticeId,
+    String writeAffiliation,
     String title,
     String target,
     LocalDateTime startTime,
@@ -16,9 +17,10 @@ public record NoticeGetResponseDto(
     LocalDateTime createdAt,
     Integer viewCount
 ) {
-    public static NoticeGetResponseDto of(Notice notice, List<String> imageList) {
+    public static NoticeGetResponseDto of(Notice notice, String WriteAffiliation, List<String> imageList) {
         return new NoticeGetResponseDto(
             notice.getId(),
+            WriteAffiliation,
             notice.getTitle(),
             notice.getTarget(),
             notice.getStartTime(),
