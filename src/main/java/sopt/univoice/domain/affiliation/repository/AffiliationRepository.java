@@ -1,4 +1,8 @@
 package sopt.univoice.domain.affiliation.repository;
 
-public interface AffiliationRepository {
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import sopt.univoice.domain.affiliation.entity.Affiliation;
+
+public interface AffiliationRepository extends JpaRepository<Affiliation, Integer> {
 }

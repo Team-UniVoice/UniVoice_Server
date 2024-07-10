@@ -8,6 +8,8 @@ import com.slack.api.webhook.WebhookResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sopt.univoice.domain.affiliation.entity.Affiliation;
+import sopt.univoice.domain.affiliation.repository.AffiliationRepository;
 import sopt.univoice.domain.auth.dto.CheckEmailRequest;
 import sopt.univoice.domain.auth.dto.MemberCreateRequest;
 import sopt.univoice.domain.auth.repository.AuthRepository;
@@ -41,6 +43,7 @@ public class AuthService {
     private final S3Service s3Service;
     private final DepartmentRepository departmentRepository;
     private final CollegeDepartmentRepository collegeDepartmentRepository;
+    private final AffiliationRepository affiliationRepository;
     private final ObjectMapper objectMapper;
 
     public boolean isDuplicateEmail(CheckEmailRequest checkEmailRequest) {
@@ -69,6 +72,9 @@ public class AuthService {
         CollegeDepartment collegeDepartment = collegeDepartmentRepository.findById(department.getCollegeDepartment().getId())
                 .orElseThrow(() -> new RuntimeException("해당 단과대학이 존재하지 않습니다."));
 
+        Affiliation affiliation = new Affiliation();
+        affiliationRepository.save(affiliation);
+
         Member member = Member.builder()
                 .admissionNumber(memberCreateRequest.getAdmissionNumber())
                 .name(memberCreateRequest.getName())
@@ -79,6 +85,7 @@ public class AuthService {
                 .universityName(memberCreateRequest.getUniversityName())
                 .departmentName(memberCreateRequest.getDepartmentName())
                 .collegeDepartmentName(collegeDepartment.getCollegeDepartmentName())
+                .affiliation(affiliation)
                 .build();
 
         authRepository.save(member);
