@@ -9,12 +9,14 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(schema = "public")
 public class Department {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "department_name")
     private String departmentName;
 
     @ManyToOne(fetch = FetchType.LAZY)

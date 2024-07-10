@@ -19,7 +19,7 @@ public class NoticeImage {
     private String noticeImage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "notice_idx")
+    @JoinColumn(name = "notice_id")
     private Notice notice;
 
     @Builder

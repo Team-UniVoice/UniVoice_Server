@@ -15,6 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(schema = "public")
 public class Member extends BaseTimeEntity {
 
     @Id

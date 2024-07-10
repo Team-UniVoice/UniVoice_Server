@@ -9,6 +9,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
+@Table(schema = "public")
 public class CollegeDepartment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -5,7 +5,7 @@ import sopt.univoice.domain.notice.entity.Notice;
 import java.awt.print.Book;
 
 public record NoticeRegisterResponseDto(
-    Long noticeIdx
+    Long noticeId
 ) {
     public static NoticeRegisterResponseDto of(Notice notice) {
         return new NoticeRegisterResponseDto(notice.getId());

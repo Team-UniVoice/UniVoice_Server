@@ -20,7 +20,7 @@ public class S3Service {
     private final String bucketName;
     private final AwsConfig awsConfig;
     private static final List<String> IMAGE_EXTENSIONS = Arrays.asList("image/jpeg", "image/png", "image/jpg", "image/webp");
-
+    private static final String S3_BUCKET_URL = "https://uni-voice-bucket.s3.ap-northeast-2.amazonaws.com/";
 
     public S3Service(@Value("${aws-property.s3-bucket-name}") final String bucketName, AwsConfig awsConfig) {
         this.bucketName = bucketName;
@@ -44,7 +44,7 @@ public class S3Service {
 
         RequestBody requestBody = RequestBody.fromBytes(image.getBytes());
         s3Client.putObject(request, requestBody);
-        return key;
+        return S3_BUCKET_URL + key;
     }
 
     public void deleteImage(String key) throws IOException {
