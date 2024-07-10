@@ -72,7 +72,7 @@ public class AuthService {
         CollegeDepartment collegeDepartment = collegeDepartmentRepository.findById(department.getCollegeDepartment().getId())
                 .orElseThrow(() -> new RuntimeException("해당 단과대학이 존재하지 않습니다."));
 
-        Affiliation affiliation = new Affiliation();
+        Affiliation affiliation = Affiliation.createDefault();
         affiliationRepository.save(affiliation);
 
         Member member = Member.builder()

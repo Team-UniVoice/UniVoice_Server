@@ -3,6 +3,7 @@ package sopt.univoice.domain.affiliation.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sopt.univoice.domain.user.entity.Member;
@@ -19,7 +20,8 @@ public class Affiliation extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     private String affiliationName;
 
@@ -34,7 +36,14 @@ public class Affiliation extends BaseTimeEntity {
     private List<Member> members;
 
 
+    // 새로운 생성자 추가
+    @Builder
+    public Affiliation(Role role) {
+        this.role = role;
+    }
 
-
+    public static Affiliation createDefault() {
+        return Affiliation.builder().role(Role.UNUSER).build();
+    }
 
 }
