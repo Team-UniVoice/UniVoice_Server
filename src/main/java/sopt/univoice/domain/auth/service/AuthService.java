@@ -6,18 +6,25 @@ import com.slack.api.model.block.LayoutBlock;
 import com.slack.api.webhook.Payload;
 import com.slack.api.webhook.WebhookResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sopt.univoice.domain.affiliation.entity.Affiliation;
 import sopt.univoice.domain.affiliation.repository.AffiliationRepository;
+import sopt.univoice.domain.auth.UserAuthentication;
 import sopt.univoice.domain.auth.dto.CheckEmailRequest;
 import sopt.univoice.domain.auth.dto.MemberCreateRequest;
+import sopt.univoice.domain.auth.dto.MemberSignInRequest;
+import sopt.univoice.domain.auth.dto.UserLoginResponse;
 import sopt.univoice.domain.auth.repository.AuthRepository;
 import sopt.univoice.domain.auth.repository.CollegeDepartmentRepository;
 import sopt.univoice.domain.universityData.entity.CollegeDepartment;
 import sopt.univoice.domain.universityData.entity.Department;
 import sopt.univoice.domain.universityData.repository.DepartmentRepository;
 import sopt.univoice.domain.user.entity.Member;
+import sopt.univoice.infra.common.exception.UnauthorizedException;
+import sopt.univoice.infra.common.exception.message.ErrorMessage;
+import sopt.univoice.infra.common.jwt.JwtTokenProvider;
 import sopt.univoice.infra.external.S3Service;
 
 import com.slack.api.model.block.Blocks;
@@ -44,6 +51,8 @@ public class AuthService {
     private final DepartmentRepository departmentRepository;
     private final CollegeDepartmentRepository collegeDepartmentRepository;
     private final AffiliationRepository affiliationRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
 
     public boolean isDuplicateEmail(CheckEmailRequest checkEmailRequest) {
@@ -75,12 +84,19 @@ public class AuthService {
         Affiliation affiliation = Affiliation.createDefault();
         affiliationRepository.save(affiliation);
 
+
+
+        // 비밀번호 해시
+        String hashedPassword = passwordEncoder.encode(memberCreateRequest.getPassword());
+
+
+
         Member member = Member.builder()
                 .admissionNumber(memberCreateRequest.getAdmissionNumber())
                 .name(memberCreateRequest.getName())
                 .studentNumber(memberCreateRequest.getStudentNumber())
                 .email(memberCreateRequest.getEmail())
-                .password(memberCreateRequest.getPassword())
+                .password(hashedPassword)
                 .studentCardImage(imageUrl)
                 .universityName(memberCreateRequest.getUniversityName())
                 .departmentName(memberCreateRequest.getDepartmentName())
@@ -131,6 +147,31 @@ public class AuthService {
             throw new RuntimeException(e);
         }
     }
+
+
+
+
+
+    @Transactional
+    public UserLoginResponse logineMember(
+            MemberSignInRequest memberSignInRequest
+    ) {
+        Member member = authRepository.findByEmail(memberSignInRequest.getEmail())
+                .orElseThrow(() -> new UnauthorizedException(ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION));
+
+        if (!passwordEncoder.matches(memberSignInRequest.getPassword(), member.getPassword())) {
+            throw new UnauthorizedException(ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION);
+        }
+
+        Long memberId = member.getId();
+        String accessToken = jwtTokenProvider.issueAccessToken(
+                UserAuthentication.createUserAuthentication(memberId)
+        );
+
+        return UserLoginResponse.of(accessToken, memberId.toString());
+    }
+
+
 
 
 }

@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sopt.univoice.domain.auth.dto.CheckEmailRequest;
 import sopt.univoice.domain.auth.dto.MemberCreateRequest;
+import sopt.univoice.domain.auth.dto.MemberSignInRequest;
+import sopt.univoice.domain.auth.dto.UserLoginResponse;
 import sopt.univoice.domain.auth.service.AuthService;
 import sopt.univoice.domain.universityData.dto.UniversityNameRequest;
 import sopt.univoice.infra.common.dto.SuccessMessage;
@@ -34,6 +36,19 @@ public class AuthController {
         }
     }
 
+
+    @PostMapping("/signin")
+    public ResponseEntity<UserLoginResponse> signIn(@RequestBody MemberSignInRequest memberSignInRequest) {
+
+        UserLoginResponse userLoginResponse = authService.logineMember(memberSignInRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .header("Location", userLoginResponse.userId())
+                .body(
+                        userLoginResponse
+                );
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<SuccessStatusResponse<Void>> signUp(@ModelAttribute MemberCreateRequest memberCreateRequest) {
         authService.signUp(memberCreateRequest);
@@ -57,6 +72,14 @@ public class AuthController {
             System.out.println("거절 버튼 클릭됨");
         }
     }
+
+
+
+
+
+
+
+
 
 
 
