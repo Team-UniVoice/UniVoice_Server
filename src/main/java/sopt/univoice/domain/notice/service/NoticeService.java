@@ -10,8 +10,9 @@ import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.entity.NoticeImage;
 import sopt.univoice.domain.notice.repository.NoticeRepository;
-import sopt.univoice.domain.user.entity.User;
+import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.user.repository.UserRepository;
+import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.external.S3Service;
 
 import java.io.IOException;
@@ -28,16 +29,11 @@ public class NoticeService {
     private final S3Service s3Service;
 
     @Transactional
-    public NoticeRegisterResponseDto registerNotice(NoticeRegisterRequestDto noticeRegisterRequestDto) {
-
-        User user = userRepository.findByIdOrThrow(1L); // 아직 accessToken부분이 구현이 안되어서 임시로 사용자 id 설정함
+    public NoticeRegisterResponseDto registerNotice(NoticeRegisterRequestDto noticeRegisterRequestDto, List<MultipartFile> files) {
+        Member member = userRepository.findByIdOrThrow(1L); // 아직 accessToken부분이 구현이 안되어서 임시로 사용자 id 설정함
         // 나중에 accessToken에서 사용자 id를 추출하는 코드 구현해서 Long id를 파라미터로 받아올 듯
 
-        List<NoticeImage> noticeImages = noticeRegisterRequestDto.noticeImage().stream()
-                                             .map(imageUrl -> NoticeImage.builder()
-                                                                  .noticeImage(imageUrl)
-                                                                  .build())
-                                             .collect(Collectors.toList());
+        List<NoticeImage> noticeImages = uploadImages(files);
 
         Notice notice = Notice.builder()
                             .title(noticeRegisterRequestDto.title())
@@ -46,7 +42,7 @@ public class NoticeService {
                             .startTime(noticeRegisterRequestDto.startTime())
                             .endTime(noticeRegisterRequestDto.endTime())
                             .category("공지사항")
-                            .user(user)
+                            .member(member)
                             .noticeLike(0)
                             .viewCount(0)
                             .noticeImages(noticeImages)
@@ -56,14 +52,19 @@ public class NoticeService {
         return NoticeRegisterResponseDto.of(noticeRepository.save(notice));
     }
 
-    @Transactional
-    public List<String> uploadImages(List<MultipartFile> files) throws IOException { // 이미지 S3에 업로드하기 위한 로직
-        List<String> imageUrls = new ArrayList<>();
-        for (MultipartFile file : files) {
-            String imageUrl = s3Service.uploadImage("notice-images/", file);
-            imageUrls.add(imageUrl);
-        }
-        return imageUrls;
+    private List<NoticeImage> uploadImages(List<MultipartFile> files) {
+        return files.stream()
+                   .map(file -> {
+                       try {
+                           String imageUrl = s3Service.uploadImage("notice-images/", file);
+                           return NoticeImage.builder()
+                                      .noticeImage(imageUrl)
+                                      .build();
+                       } catch (IOException e) {
+                           throw new RuntimeException(ErrorMessage.UPLOAD_FAILED.getMessage(), e);
+                       }
+                   })
+                   .collect(Collectors.toList());
     }
 
     @Transactional

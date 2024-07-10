@@ -1,6 +1,5 @@
 package sopt.univoice.infra.external;
 
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,7 +20,7 @@ public class S3Service {
     private final String bucketName;
     private final AwsConfig awsConfig;
     private static final List<String> IMAGE_EXTENSIONS = Arrays.asList("image/jpeg", "image/png", "image/jpg", "image/webp");
-
+    private static final String S3_BUCKET_URL = "https://uni-voice-bucket.s3.ap-northeast-2.amazonaws.com/";
 
     public S3Service(@Value("${aws-property.s3-bucket-name}") final String bucketName, AwsConfig awsConfig) {
         this.bucketName = bucketName;
@@ -37,31 +36,27 @@ public class S3Service {
         validateFileSize(image);
 
         PutObjectRequest request = PutObjectRequest.builder()
-                                       .bucket(bucketName)
-                                       .key(key)
-                                       .contentType(image.getContentType())
-                                       .contentDisposition("inline")
-                                       .build();
+                .bucket(bucketName)
+                .key(key)
+                .contentType(image.getContentType())
+                .contentDisposition("inline")
+                .build();
 
         RequestBody requestBody = RequestBody.fromBytes(image.getBytes());
         s3Client.putObject(request, requestBody);
-
-        return generatePresignedUrl(key);
+        return S3_BUCKET_URL + key;
     }
 
     public void deleteImage(String key) throws IOException {
         final S3Client s3Client = awsConfig.getS3Client();
 
         s3Client.deleteObject((DeleteObjectRequest.Builder builder) ->
-                                  builder.bucket(bucketName)
-                                      .key(key)
-                                      .build()
+                builder.bucket(bucketName)
+                        .key(key)
+                        .build()
         );
     }
 
-    private String generatePresignedUrl(String key) {
-        return "https://" + bucketName + ".s3.amazonaws.com/" + key;
-    }
 
     private String generateImageFileName() {
         return UUID.randomUUID() + ".jpg";

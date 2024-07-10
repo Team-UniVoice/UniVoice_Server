@@ -2,9 +2,6 @@ package sopt.univoice.domain.notice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import sopt.univoice.domain.user.entity.User;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -15,14 +12,14 @@ public class NoticeImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notice_image_idx")
-    private Long noticeImageIdx;
+    @Column(name = "notice_image_id")
+    private Long id;
 
     @Column(name = "notice_image", length = 255)
     private String noticeImage;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "notice_idx")
+    @JoinColumn(name = "notice_id")
     private Notice notice;
 
     @Builder
