@@ -8,6 +8,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import sopt.univoice.domain.affiliation.entity.Affiliation;
 import sopt.univoice.domain.notice.entity.Notice;
+import sopt.univoice.domain.notice.entity.NoticeLike;
+import sopt.univoice.domain.notice.entity.NoticeView;
+import sopt.univoice.domain.notice.entity.SaveNotice;
 import sopt.univoice.infra.persistence.BaseTimeEntity;
 
 import java.util.Collection;
@@ -47,6 +50,17 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notice> notices;
+
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NoticeLike> noticeLikes; // Member와 NoticeLike의 1:N 관계
+
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SaveNotice> saveNotices; // Member와 NoticeLike의 1:N 관계
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<NoticeView> noticeView; // Member와 NoticeLike의 1:N 관계
 
     @Builder
     public Member(Long admissionNumber, String name, String studentNumber, String email, String password, String studentCardImage,
