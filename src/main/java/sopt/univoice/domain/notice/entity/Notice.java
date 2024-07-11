@@ -73,6 +73,8 @@ public class Notice   extends BaseTimeEntity {
     }
 
 
-
+    public void setNoticeLike(Long noticeLike) {
+        this.noticeLike = noticeLike;
+    }
 
 }

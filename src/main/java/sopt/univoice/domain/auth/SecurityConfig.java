@@ -53,7 +53,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> {
                     auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
-                    auth.requestMatchers("/api/v1/notice").hasAnyAuthority("APPROVEUSER", "APPROVEADMIN");
+                    auth.requestMatchers("/api/v1/notice/**").hasAnyAuthority("APPROVEUSER", "APPROVEADMIN");
                     auth.requestMatchers("/api/v1/notice/create").hasAuthority("APPROVEADMIN");
                     auth.anyRequest().authenticated();
                 })

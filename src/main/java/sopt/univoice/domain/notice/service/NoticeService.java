@@ -10,7 +10,9 @@ import sopt.univoice.domain.auth.repository.AuthRepository;
 import sopt.univoice.domain.notice.dto.NoticeCreateRequest;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.entity.NoticeImage;
+import sopt.univoice.domain.notice.entity.NoticeLike;
 import sopt.univoice.domain.notice.repository.NoticeImageRepository;
+import sopt.univoice.domain.notice.repository.NoticeLikeRepository;
 import sopt.univoice.domain.notice.repository.NoticeRepository;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.affiliation.entity.Role;
@@ -33,6 +35,7 @@ public class NoticeService {
     private final PrincipalHandler principalHandler;
     private final S3Service s3Service;
     private final OpenAiService openAiService;
+    private final NoticeLikeRepository noticeLikeRepository;
 
     @Transactional
     public void createPost(NoticeCreateRequest noticeCreateRequest) {
@@ -89,4 +92,54 @@ public class NoticeService {
             throw new RuntimeException("파일 업로드에 실패했습니다.", e);
         }
     }
+
+
+    @Transactional
+    public void likeNotice(Long noticeId) {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
+        // member와 notice를 가져옵니다.
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
+
+        // noticeLike를 1 증가시킵니다.
+        notice.setNoticeLike(notice.getNoticeLike() + 1);
+        noticeRepository.save(notice);
+
+        // NoticeLike 객체를 생성하고 저장합니다.
+        NoticeLike noticeLike = NoticeLike.builder()
+                .notice(notice)
+                .member(member)
+                .build();
+        noticeLikeRepository.save(noticeLike);
+    }
+
+
+    @Transactional
+    public void likeCancleNotice(Long noticeId) {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
+        // member와 notice를 가져옵니다.
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
+
+        // noticeLike를 1 감소시킵니다.
+        notice.setNoticeLike(notice.getNoticeLike() - 1);
+        noticeRepository.save(notice);
+
+        // NoticeLike 테이블에서 해당 데이터를 삭제합니다.
+        NoticeLike noticeLike = noticeLikeRepository.findByNoticeAndMember(notice, member)
+                .orElseThrow(() -> new RuntimeException("좋아요 정보가 존재하지 않습니다."));
+        noticeLikeRepository.delete(noticeLike);
+    }
+
+
+
+
+
+
 }
