@@ -26,9 +26,9 @@ public class Notice   extends BaseTimeEntity {
 
     private String content;
 
-    private Long noticeLike;
+    private Long noticeLike = 0L;
 
-    private Long viewCount;
+    private Long viewCount = 0L;
     private String target;
 
     private LocalDateTime startTime;
@@ -66,6 +66,8 @@ public class Notice   extends BaseTimeEntity {
         this.startTime = startTime;
         this.endTime = endTime;
         this.member = member;
+        this.noticeLike = 0L;
+        this.viewCount = 0L;
     }
 
 
