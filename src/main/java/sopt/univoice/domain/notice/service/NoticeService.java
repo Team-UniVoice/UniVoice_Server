@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sopt.univoice.domain.auth.PrincipalHandler;
 import sopt.univoice.domain.auth.repository.AuthRepository;
 import sopt.univoice.domain.notice.dto.NoticeCreateRequest;
+import sopt.univoice.domain.notice.dto.NoticeSaveDTO;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.entity.NoticeImage;
 import sopt.univoice.domain.notice.entity.NoticeLike;
@@ -26,6 +27,7 @@ import sopt.univoice.infra.external.S3Service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -176,6 +178,30 @@ public class NoticeService {
         saveNoticeRepository.delete(saveNotice);
     }
 
+    @Transactional(readOnly = true)
+    public List<NoticeSaveDTO> getSaveNoticeByUser() {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+
+        List<SaveNotice> saveNotices = saveNoticeRepository.findByMember(member);
+
+        return saveNotices.stream()
+                .map(saveNotice -> {
+                    Notice notice = saveNotice.getNotice();
+                    return new NoticeSaveDTO(
+                            notice.getId(),
+                            notice.getTitle(),
+                            notice.getViewCount(),
+                            notice.getNoticeLike(),
+                            notice.getCategory(),
+                            notice.getStartTime(),
+                            notice.getEndTime()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
 
 
 
