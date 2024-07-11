@@ -1,15 +1,13 @@
 package sopt.univoice.domain.auth.dto;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 @Setter
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class MemberCreateRequest{
 
     private  Long admissionNumber;
@@ -27,6 +25,8 @@ public class MemberCreateRequest{
     private String  universityName;
 
     private String departmentName;
+
+
 
 
 }

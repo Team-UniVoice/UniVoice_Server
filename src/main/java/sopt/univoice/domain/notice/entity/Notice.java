@@ -2,6 +2,7 @@ package sopt.univoice.domain.notice.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sopt.univoice.domain.firstcome.entity.FirstCome;
@@ -56,5 +57,18 @@ public class Notice   extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NoticeLike> noticeLikes;
+
+    @Builder
+    public Notice(String title, String content, Long target, LocalDateTime startTime, LocalDateTime endTime, Member member) {
+        this.title = title;
+        this.content = content;
+        this.target = target;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.member = member;
+    }
+
+
+
 
 }
