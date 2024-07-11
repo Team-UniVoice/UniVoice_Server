@@ -36,6 +36,13 @@ public class Affiliation extends BaseTimeEntity {
     private List<Member> members;
 
 
+
+
+
+
+
+
+
     // 새로운 생성자 추가
     @Builder
     public Affiliation(Role role) {

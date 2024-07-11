@@ -5,7 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sopt.univoice.domain.affiliation.entity.Affiliation;
+import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.infra.persistence.BaseTimeEntity;
+
+import java.util.List;
 
 
 @Entity
@@ -37,6 +40,10 @@ public class Member extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "affiliation_id")
     private Affiliation affiliation;
+
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notice> notices;
 
     @Builder
     public Member(Long admissionNumber, String name, String studentNumber, String email, String password, String studentCardImage,
