@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import sopt.univoice.domain.affiliation.entity.Role;
 import sopt.univoice.domain.notice.dto.request.NoticeRegisterRequestDto;
 import sopt.univoice.domain.notice.dto.response.NoticeGetResponseDto;
 import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
@@ -40,6 +41,10 @@ public class NoticeService {
 
         Member member = userRepository.findByIdOrThrow(memberId); // 아직 accessToken부분이 구현이 안되어서 임시로 사용자 id 설정함
         // 나중에 accessToken에서 사용자 id를 추출하는 코드 구현해서 Long id를 파라미터로 받아올 듯
+
+        if (member.getAffiliation().getRole() != Role.APPROVEADMIN) {
+            throw new BusinessException(ErrorMessage.UNAUTHORIZED_EXCEPTION);
+        }
 
         List<NoticeImage> noticeImages = uploadImages(files);
 
