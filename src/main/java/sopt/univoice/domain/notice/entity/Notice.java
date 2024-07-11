@@ -61,6 +61,9 @@ public class Notice extends BaseTimeEntity {
         this.noticeLike++;
     }
 
+    public void decrementLike() {
+        this.noticeLike--;
+    }
     @Builder
     public Notice(String title, String content, Integer noticeLike, Integer viewCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, Member member, List<NoticeImage> noticeImages) {
         this.title = title;

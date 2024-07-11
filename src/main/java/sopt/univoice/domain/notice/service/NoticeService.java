@@ -97,6 +97,7 @@ public class NoticeService {
 
     }
 
+    @Transactional
     public void postLike(Long noticeId) {
         Notice notice = noticeRepository.findByIdOrThrow(noticeId);
 
@@ -115,6 +116,21 @@ public class NoticeService {
         noticeLikeRepository.save(noticeLike);
 
         notice.incrementLike();
+        noticeRepository.save(notice);
+    }
+
+    @Transactional
+    public void deleteLike(Long noticeId) {
+        Notice notice = noticeRepository.findByIdOrThrow(noticeId);
+
+        Member member = userRepository.findByIdOrThrow(1L);
+
+        NoticeLike noticeLike = noticeLikeRepository.findByNoticeAndMember(notice, member)
+                                    .orElseThrow(() -> new BusinessException(ErrorMessage.ALREADY_CANCELED));
+
+        noticeLikeRepository.delete(noticeLike);
+
+        notice.decrementLike();
         noticeRepository.save(notice);
     }
 }

@@ -47,4 +47,13 @@ public class NoticeController {
         noticeService.postLike(noticeId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.POST_LIKE_SUCCESS));
     }
+
+    @DeleteMapping("/like/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<Void>> deleteLike(@RequestHeader("Authorization") String accessToken, @PathVariable Long noticeId) {
+        if (!ACCESS_TOKEN.equals(accessToken)) { // 아직 accessToken이 없어서 임시로 검증하는 부분
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        noticeService.deleteLike(noticeId);
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.DELETE_LIKE_SUCCESS));
+    }
 }
