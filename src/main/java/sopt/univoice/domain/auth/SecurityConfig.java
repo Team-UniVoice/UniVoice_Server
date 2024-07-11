@@ -29,7 +29,8 @@ public class SecurityConfig {
             "/api/v1/universityData/department",
             "/api/v1/auth/check-email",
             "/api/v1/auth/signup",
-            "/api/v1/auth/accecpt"
+            "/api/v1/auth/accecpt",
+            "api/v1/auth/"
     };
 
     @Bean

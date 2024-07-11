@@ -49,7 +49,7 @@ public class JwtTokenProvider {
         // Claim에는 token 생성시간과 만료시간, 그리고 사용자 인증 정보가 들어간다.
         claims.put(USER_ID, authentication.getPrincipal());
         claims.put(ROLES, authentication.getAuthorities().stream()
-                .map(grantedAuthority -> grantedAuthority.getAuthority()) // 'ROLE_' 접두사 추가
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
                 .collect(Collectors.toList()));
 
         //헤더 타입을 설정해주는 Header Param, Claim 을 이용한 정보를 대상으로 암호화하여 Jwt 토큰을 만들어 반환.

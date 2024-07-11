@@ -16,6 +16,7 @@ import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.affiliation.entity.Role;
 import sopt.univoice.infra.common.exception.UnauthorizedException;
 import sopt.univoice.infra.common.exception.message.ErrorMessage;
+import sopt.univoice.infra.external.OpenAiService;
 import sopt.univoice.infra.external.S3Service;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ public class NoticeService {
     private final AuthRepository authRepository;
     private final PrincipalHandler principalHandler;
     private final S3Service s3Service;
+    private final OpenAiService openAiService;
 
     @Transactional
     public void createPost(NoticeCreateRequest noticeCreateRequest) {
@@ -40,6 +42,14 @@ public class NoticeService {
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         System.out.println("Member Role: " + member.getAffiliation().getRole());
 
+        String summarizedContent = null;
+        try {
+            summarizedContent = openAiService.summarizeText(noticeCreateRequest.getContent());
+            System.out.println("Summarized Content: " + summarizedContent);
+        } catch (IOException e) {
+            System.err.println("Error summarizing content: " + e.getMessage());
+            e.printStackTrace();
+        }
 
         // 사용자 권한 확인
         if (member.getAffiliation().getRole() != Role.APPROVEADMIN) {
@@ -55,6 +65,7 @@ public class NoticeService {
                 .startTime(noticeCreateRequest.getStartTime())
                 .endTime(noticeCreateRequest.getEndTime())
                 .member(member)
+                .contentSummary(summarizedContent)
                 .build();
         noticeRepository.save(notice);
         System.out.println("Notice saved successfully with ID: " + notice.getId());

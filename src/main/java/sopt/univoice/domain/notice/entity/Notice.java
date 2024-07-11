@@ -35,7 +35,8 @@ public class Notice   extends BaseTimeEntity {
     private LocalDateTime endTime;
 
     private Long category;
-    private Long contentSummary;
+
+    private String contentSummary;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -59,7 +60,7 @@ public class Notice   extends BaseTimeEntity {
     private List<NoticeLike> noticeLikes;
 
     @Builder
-    public Notice(String title, String content, String target, LocalDateTime startTime, LocalDateTime endTime, Member member) {
+    public Notice(String title, String content, String target, LocalDateTime startTime, LocalDateTime endTime, Member member, String contentSummary) {
         this.title = title;
         this.content = content;
         this.target = target;
@@ -68,6 +69,7 @@ public class Notice   extends BaseTimeEntity {
         this.member = member;
         this.noticeLike = 0L;
         this.viewCount = 0L;
+        this.contentSummary = contentSummary;
     }
 
 
