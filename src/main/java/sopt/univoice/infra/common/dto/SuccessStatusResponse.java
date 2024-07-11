@@ -1,9 +1,11 @@
 package sopt.univoice.infra.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import sopt.univoice.infra.common.exception.message.ErrorMessage;
 
 import java.util.Map;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record SuccessStatusResponse<T>(
     int status,
     String message,

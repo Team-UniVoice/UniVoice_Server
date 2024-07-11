@@ -1,6 +1,7 @@
 package sopt.univoice.domain.notice.service;
 
 import jakarta.transaction.Transactional;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,9 +10,12 @@ import sopt.univoice.domain.notice.dto.response.NoticeGetResponseDto;
 import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.entity.NoticeImage;
+import sopt.univoice.domain.notice.entity.NoticeLike;
+import sopt.univoice.domain.notice.repository.NoticeLikeRepository;
 import sopt.univoice.domain.notice.repository.NoticeRepository;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.user.repository.UserRepository;
+import sopt.univoice.infra.common.exception.message.BusinessException;
 import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.external.S3Service;
 
@@ -26,9 +30,11 @@ public class NoticeService {
     private final NoticeRepository noticeRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final NoticeLikeRepository noticeLikeRepository;
 
     @Transactional
     public NoticeRegisterResponseDto registerNotice(NoticeRegisterRequestDto noticeRegisterRequestDto, List<MultipartFile> files) {
+        // Long memberId = principalHandler.getUserIdFromAccessToken(accessToken);
         Member member = userRepository.findByIdOrThrow(1L); // 아직 accessToken부분이 구현이 안되어서 임시로 사용자 id 설정함
         // 나중에 accessToken에서 사용자 id를 추출하는 코드 구현해서 Long id를 파라미터로 받아올 듯
 
@@ -89,5 +95,26 @@ public class NoticeService {
 
         return NoticeGetResponseDto.of(notice, writeAffiliation, imageList);
 
+    }
+
+    public void postLike(Long noticeId) {
+        Notice notice = noticeRepository.findByIdOrThrow(noticeId);
+
+        Member member = userRepository.findByIdOrThrow(1L);
+        // 추후 memberId 파라미터로 넣어 유저 검증
+
+        boolean alreadyLiked = noticeLikeRepository.existsByNoticeAndMember(notice, member);
+        if (alreadyLiked) {
+            throw new BusinessException( ErrorMessage.ALREADY_LIKED);
+        }
+
+        NoticeLike noticeLike = NoticeLike.builder()
+                                    .notice(notice)
+                                    .member(member)
+                                    .build();
+        noticeLikeRepository.save(noticeLike);
+
+        notice.incrementLike();
+        noticeRepository.save(notice);
     }
 }
