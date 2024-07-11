@@ -24,36 +24,24 @@ public class NoticeController {
     private static final String ACCESS_TOKEN = "access-token";
 
     @PostMapping
-    public ResponseEntity<SuccessStatusResponse<NoticeRegisterResponseDto>> registerNotice(@RequestHeader("Authorization") String accessToken, @ModelAttribute NoticeRegisterRequestDto noticeRegisterRequestDto, @RequestPart(value = "file") List<MultipartFile> files) {
-        if (!ACCESS_TOKEN.equals(accessToken)) { // 아직 accessToken이 없어서 임시로 검증하는 부분
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.POST_NOTICE_SUCCESS, noticeService.registerNotice(noticeRegisterRequestDto, files)));
+    public ResponseEntity<SuccessStatusResponse<NoticeRegisterResponseDto>> registerNotice(@ModelAttribute NoticeRegisterRequestDto noticeRegisterRequestDto, @RequestPart(value = "file") List<MultipartFile> files, @RequestHeader Long memberId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.POST_NOTICE_SUCCESS, noticeService.registerNotice(noticeRegisterRequestDto, files, memberId)));
     }
 
     @GetMapping("/{noticeId}")
-    public ResponseEntity<SuccessStatusResponse<NoticeGetResponseDto>> getNotice(@RequestHeader("Authorization") String accessToken, @PathVariable Long noticeId) {
-        if (!ACCESS_TOKEN.equals(accessToken)) { // 아직 accessToken이 없어서 임시로 검증하는 부분
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.GET_NOICE_SUCCESS, noticeService.getNotice(noticeId)));
+    public ResponseEntity<SuccessStatusResponse<NoticeGetResponseDto>> getNotice(@PathVariable Long noticeId, @RequestHeader Long memberId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.GET_NOICE_SUCCESS, noticeService.getNotice(noticeId, memberId)));
     }
 
     @PostMapping("/like/{noticeId}")
-    public ResponseEntity<SuccessStatusResponse<Void>> postLike(@RequestHeader("Authorization") String accessToken, @PathVariable Long noticeId) {
-        if (!ACCESS_TOKEN.equals(accessToken)) { // 아직 accessToken이 없어서 임시로 검증하는 부분
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        noticeService.postLike(noticeId);
+    public ResponseEntity<SuccessStatusResponse<Void>> postLike(@PathVariable Long noticeId, @RequestHeader Long memberId) {
+        noticeService.postLike(noticeId, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.POST_LIKE_SUCCESS));
     }
 
     @DeleteMapping("/like/{noticeId}")
-    public ResponseEntity<SuccessStatusResponse<Void>> deleteLike(@RequestHeader("Authorization") String accessToken, @PathVariable Long noticeId) {
-        if (!ACCESS_TOKEN.equals(accessToken)) { // 아직 accessToken이 없어서 임시로 검증하는 부분
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        noticeService.deleteLike(noticeId);
+    public ResponseEntity<SuccessStatusResponse<Void>> deleteLike(@PathVariable Long noticeId, @RequestHeader Long memberId) {
+        noticeService.deleteLike(noticeId, memberId);
         return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.DELETE_LIKE_SUCCESS));
     }
 }

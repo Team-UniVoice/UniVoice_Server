@@ -7,8 +7,8 @@ import sopt.univoice.infra.common.exception.message.ErrorMessage;
 
 public interface UserRepository extends JpaRepository<Member, Long> {
 
-    default Member findByIdOrThrow(Long idx) {
-        return this.findById(idx)
+    default Member findByIdOrThrow(Long id) {
+        return this.findById(id)
                    .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_USER));
     }
 }

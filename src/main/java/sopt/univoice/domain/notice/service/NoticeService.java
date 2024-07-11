@@ -33,9 +33,9 @@ public class NoticeService {
     private final NoticeLikeRepository noticeLikeRepository;
 
     @Transactional
-    public NoticeRegisterResponseDto registerNotice(NoticeRegisterRequestDto noticeRegisterRequestDto, List<MultipartFile> files) {
-        // Long memberId = principalHandler.getUserIdFromAccessToken(accessToken);
-        Member member = userRepository.findByIdOrThrow(1L); // 아직 accessToken부분이 구현이 안되어서 임시로 사용자 id 설정함
+    public NoticeRegisterResponseDto registerNotice(NoticeRegisterRequestDto noticeRegisterRequestDto, List<MultipartFile> files, Long memberId) {
+
+        Member member = userRepository.findByIdOrThrow(memberId); // 아직 accessToken부분이 구현이 안되어서 임시로 사용자 id 설정함
         // 나중에 accessToken에서 사용자 id를 추출하는 코드 구현해서 Long id를 파라미터로 받아올 듯
 
         List<NoticeImage> noticeImages = uploadImages(files);
@@ -50,6 +50,7 @@ public class NoticeService {
                             .member(member)
                             .noticeLike(0)
                             .viewCount(0)
+                            .saveCount(0)
                             .noticeImages(noticeImages)
                             .build();
 
@@ -73,11 +74,10 @@ public class NoticeService {
     }
 
     @Transactional
-    public NoticeGetResponseDto getNotice(Long noticeId) {
-
+    public NoticeGetResponseDto getNotice(Long noticeId, Long memberId) {
         Notice notice = noticeRepository.findByIdOrThrow(noticeId);
 
-        Member member = userRepository.findByIdOrThrow(1L);
+        Member member = userRepository.findByIdOrThrow(memberId);
 
         // 소속명 설정
         String writeAffiliation;
@@ -98,10 +98,10 @@ public class NoticeService {
     }
 
     @Transactional
-    public void postLike(Long noticeId) {
+    public void postLike(Long noticeId, Long memberId) {
         Notice notice = noticeRepository.findByIdOrThrow(noticeId);
 
-        Member member = userRepository.findByIdOrThrow(1L);
+        Member member = userRepository.findByIdOrThrow(memberId);
         // 추후 memberId 파라미터로 넣어 유저 검증
 
         boolean alreadyLiked = noticeLikeRepository.existsByNoticeAndMember(notice, member);
@@ -120,10 +120,10 @@ public class NoticeService {
     }
 
     @Transactional
-    public void deleteLike(Long noticeId) {
+    public void deleteLike(Long noticeId, Long memberId) {
         Notice notice = noticeRepository.findByIdOrThrow(noticeId);
 
-        Member member = userRepository.findByIdOrThrow(1L);
+        Member member = userRepository.findByIdOrThrow(memberId);
 
         NoticeLike noticeLike = noticeLikeRepository.findByNoticeAndMember(notice, member)
                                     .orElseThrow(() -> new BusinessException(ErrorMessage.ALREADY_CANCELED));
