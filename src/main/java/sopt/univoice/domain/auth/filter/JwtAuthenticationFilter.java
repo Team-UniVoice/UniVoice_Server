@@ -43,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         // 화이트리스트 경로인 경우 필터를 통과시킴
+        System.out.println("Request URI(filter): " + request.getRequestURI());
         if (WHITE_LIST_PATHS.contains(request.getRequestURI())) {
             filterChain.doFilter(request, response);
             return;
@@ -53,28 +54,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token) == JwtValidationType.VALID_JWT) {
                 Long userId = jwtTokenProvider.getUserFromJwt(token);
                 Collection authorities = jwtTokenProvider.getAuthoritiesFromJwt(token);
+                System.out.println("Authenticated User ID(filter): " + userId);
+                System.out.println("Authorities(filter): " + authorities);
 
                 UserAuthentication authentication = new UserAuthentication(userId, null, authorities);
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println("User authenticated successfully with roles: (filter)" + authorities);
+            } else {
+                System.out.println("Token is not valid or not present");
             }
         } catch (Exception exception) {
+            System.out.println("Exception during token validation: " + exception.getMessage());
             throw new UnauthorizedException(ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION);
         }
+        System.out.println("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ");
         filterChain.doFilter(request, response);
+        System.out.println("ㅇㅇㅇㅇ");
     }
-
-
-
-
-
 
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring("Bearer ".length());
+            String token = bearerToken.substring("Bearer ".length());
+            System.out.println("Extracted JWT Token(filter): " + token);
+            return token;
         }
+        System.out.println("No JWT Token found in request");
         return null;
     }
 }

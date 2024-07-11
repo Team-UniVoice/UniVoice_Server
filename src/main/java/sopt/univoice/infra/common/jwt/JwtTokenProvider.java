@@ -49,7 +49,7 @@ public class JwtTokenProvider {
         // Claim에는 token 생성시간과 만료시간, 그리고 사용자 인증 정보가 들어간다.
         claims.put(USER_ID, authentication.getPrincipal());
         claims.put(ROLES, authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+                .map(grantedAuthority -> grantedAuthority.getAuthority()) // 'ROLE_' 접두사 추가
                 .collect(Collectors.toList()));
 
         //헤더 타입을 설정해주는 Header Param, Claim 을 이용한 정보를 대상으로 암호화하여 Jwt 토큰을 만들어 반환.
@@ -69,14 +69,19 @@ public class JwtTokenProvider {
     public JwtValidationType validateToken(String token) {
         try {
             final Claims claims = getBody(token);
+            System.out.println("Token is valid(Provider): " + claims);
             return JwtValidationType.VALID_JWT;
         } catch (MalformedJwtException ex) {
+            System.out.println("Invalid JWT Token: " + ex.getMessage());
             return JwtValidationType.INVALID_JWT_TOKEN;
         } catch (ExpiredJwtException ex) {
+            System.out.println("Expired JWT Token: " + ex.getMessage());
             return JwtValidationType.EXPIRED_JWT_TOKEN;
         } catch (UnsupportedJwtException ex) {
+            System.out.println("Unsupported JWT Token: " + ex.getMessage());
             return JwtValidationType.UNSUPPORTED_JWT_TOKEN;
         } catch (IllegalArgumentException ex) {
+            System.out.println("JWT Token is empty: " + ex.getMessage());
             return JwtValidationType.EMPTY_JWT;
         }
     }
@@ -99,6 +104,12 @@ public class JwtTokenProvider {
     public Collection<? extends GrantedAuthority> getAuthoritiesFromJwt(String token) {
         Claims claims = getBody(token);
         List<String> roles = claims.get(ROLES, List.class);
+        if (roles == null) {
+            System.out.println("역할 정보가 없어 빈 리스트 " );
+
+            return new ArrayList<>(); // 역할 정보가 없을 경우 빈 리스트 반환
+        }
+
         return roles.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());

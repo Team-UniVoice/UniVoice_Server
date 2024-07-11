@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import sopt.univoice.domain.affiliation.entity.Affiliation;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.infra.persistence.BaseTimeEntity;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -58,6 +61,10 @@ public class Member extends BaseTimeEntity {
         this.collegeDepartmentName = collegeDepartmentName;
         this.departmentName = departmentName;
         this.affiliation = affiliation;
+    }
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority( affiliation.getRole().name()));
     }
 
 }

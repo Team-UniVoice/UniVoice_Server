@@ -6,6 +6,7 @@ import com.slack.api.model.block.LayoutBlock;
 import com.slack.api.webhook.Payload;
 import com.slack.api.webhook.WebhookResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ import com.slack.api.model.block.element.BlockElements;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import static com.slack.api.model.block.composition.BlockCompositions.plainText;
@@ -150,8 +152,6 @@ public class AuthService {
 
 
 
-
-
     @Transactional
     public UserLoginResponse logineMember(
             MemberSignInRequest memberSignInRequest
@@ -164,8 +164,9 @@ public class AuthService {
         }
 
         Long memberId = member.getId();
+        Collection<? extends GrantedAuthority> authorities = member.getAuthorities(); // 역할 정보 가져오기
         String accessToken = jwtTokenProvider.issueAccessToken(
-                UserAuthentication.createUserAuthentication(memberId)
+                UserAuthentication.createUserAuthentication(memberId, authorities)
         );
 
         return UserLoginResponse.of(accessToken, memberId.toString());

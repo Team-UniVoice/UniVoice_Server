@@ -29,7 +29,7 @@ public class Notice   extends BaseTimeEntity {
     private Long noticeLike;
 
     private Long viewCount;
-    private Long target;
+    private String target;
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -59,7 +59,7 @@ public class Notice   extends BaseTimeEntity {
     private List<NoticeLike> noticeLikes;
 
     @Builder
-    public Notice(String title, String content, Long target, LocalDateTime startTime, LocalDateTime endTime, Member member) {
+    public Notice(String title, String content, String target, LocalDateTime startTime, LocalDateTime endTime, Member member) {
         this.title = title;
         this.content = content;
         this.target = target;

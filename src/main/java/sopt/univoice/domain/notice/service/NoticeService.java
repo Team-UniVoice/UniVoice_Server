@@ -35,11 +35,15 @@ public class NoticeService {
     @Transactional
     public void createPost(NoticeCreateRequest noticeCreateRequest) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
+        System.out.println("Authenticated Member ID: " + memberId);
         Member member = authRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+        System.out.println("Member Role: " + member.getAffiliation().getRole());
+
 
         // 사용자 권한 확인
         if (member.getAffiliation().getRole() != Role.APPROVEADMIN) {
+            System.out.println("User does not have APPROVEADMIN role");
             throw new UnauthorizedException(ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION);
         }
 
@@ -47,12 +51,13 @@ public class NoticeService {
         Notice notice = Notice.builder()
                 .title(noticeCreateRequest.getTitle())
                 .content(noticeCreateRequest.getContent())
-                .target(noticeCreateRequest.getTarget().orElse(null))
-                .startTime(noticeCreateRequest.getStartTime().orElse(null))
-                .endTime(noticeCreateRequest.getEndTime().orElse(null))
+                .target(noticeCreateRequest.getTarget())
+                .startTime(noticeCreateRequest.getStartTime())
+                .endTime(noticeCreateRequest.getEndTime())
                 .member(member)
                 .build();
         noticeRepository.save(notice);
+        System.out.println("Notice saved successfully with ID: " + notice.getId());
 
         // NoticeImage 엔티티 생성 및 저장
         for (MultipartFile file : noticeCreateRequest.getStudentCardImages()) {
@@ -62,6 +67,7 @@ public class NoticeService {
                     .noticeImage(fileName)
                     .build();
             noticeImageRepository.save(noticeImage);
+            System.out.println("NoticeImage saved successfully with file name: " + fileName);
         }
     }
 

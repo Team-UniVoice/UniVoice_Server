@@ -39,6 +39,7 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        System.out.println("aaaaa");
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .requestCache(RequestCacheConfigurer::disable)
@@ -47,15 +48,15 @@ public class SecurityConfig {
                     exception.authenticationEntryPoint(customJwtAuthenticationEntryPoint);
                     exception.accessDeniedHandler(customAccessDeniedHandler);
                 });
+        System.out.println("Bbb");
 
         http.authorizeHttpRequests(auth -> {
                     auth.requestMatchers(AUTH_WHITE_LIST).permitAll();
-                    auth.requestMatchers("/api/v1/notice").hasAnyRole("APPROVEUSER", "APPROVEADMIN");
-                    auth.requestMatchers("/api/v1/notice/**").hasRole("APPROVEADMIN");
+                    auth.requestMatchers("/api/v1/notice").hasAnyAuthority("APPROVEUSER", "APPROVEADMIN");
+                    auth.requestMatchers("/api/v1/notice/**").hasAuthority("APPROVEADMIN");
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 }
