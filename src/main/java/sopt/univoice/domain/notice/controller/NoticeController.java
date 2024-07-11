@@ -44,4 +44,27 @@ public class NoticeController {
     }
 
 
+
+    @PostMapping("/save/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<Object>> saveNotice(@PathVariable Long noticeId) {
+
+        noticeService.saveNotice(noticeId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessStatusResponse.of(SuccessMessage.SAVE_NOTICE_SUCCESS, null));
+    }
+
+    @PostMapping("/save/cancle/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<Object>> saveCancleNotice(@PathVariable Long noticeId) {
+
+        noticeService.saveCancleNotice(noticeId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessStatusResponse.of(SuccessMessage.SAVE_CANCLE_NOTICE_SUCCESS, null));
+    }
+
+
+
+
+
+
+
 }

@@ -77,4 +77,6 @@ public class Notice   extends BaseTimeEntity {
         this.noticeLike = noticeLike;
     }
 
+
+
 }

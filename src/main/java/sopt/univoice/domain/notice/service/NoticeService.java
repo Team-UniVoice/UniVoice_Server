@@ -11,9 +11,11 @@ import sopt.univoice.domain.notice.dto.NoticeCreateRequest;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.entity.NoticeImage;
 import sopt.univoice.domain.notice.entity.NoticeLike;
+import sopt.univoice.domain.notice.entity.SaveNotice;
 import sopt.univoice.domain.notice.repository.NoticeImageRepository;
 import sopt.univoice.domain.notice.repository.NoticeLikeRepository;
 import sopt.univoice.domain.notice.repository.NoticeRepository;
+import sopt.univoice.domain.notice.repository.SaveNoticeRepository;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.affiliation.entity.Role;
 import sopt.univoice.infra.common.exception.UnauthorizedException;
@@ -36,6 +38,7 @@ public class NoticeService {
     private final S3Service s3Service;
     private final OpenAiService openAiService;
     private final NoticeLikeRepository noticeLikeRepository;
+    private final SaveNoticeRepository saveNoticeRepository;
 
     @Transactional
     public void createPost(NoticeCreateRequest noticeCreateRequest) {
@@ -135,6 +138,42 @@ public class NoticeService {
         NoticeLike noticeLike = noticeLikeRepository.findByNoticeAndMember(notice, member)
                 .orElseThrow(() -> new RuntimeException("좋아요 정보가 존재하지 않습니다."));
         noticeLikeRepository.delete(noticeLike);
+    }
+
+    @Transactional
+    public void saveNotice(Long noticeId) {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
+        // member와 notice를 가져옵니다.
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
+
+
+
+        // SaveNotice 엔티티 생성 및 저장
+        SaveNotice saveNotice = SaveNotice.builder()
+                .notice(notice)
+                .member(member)
+                .build();
+        saveNoticeRepository.save(saveNotice);
+    }
+
+    @Transactional
+    public void saveCancleNotice(Long noticeId) {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
+        // member와 notice를 가져옵니다.
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
+
+        // SaveNotice 엔티티 삭제
+        SaveNotice saveNotice = saveNoticeRepository.findByNoticeAndMember(notice, member)
+                .orElseThrow(() -> new RuntimeException("저장된 공지사항이 존재하지 않습니다."));
+        saveNoticeRepository.delete(saveNotice);
     }
 
 
