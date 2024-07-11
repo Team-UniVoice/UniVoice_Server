@@ -18,7 +18,8 @@ public enum SuccessMessage {
     SIGNUP_SUCCESS(HttpStatus.CREATED.value(),"회원가입에 성공하였습니다."),
     GET_NOICE_SUCCESS(HttpStatus.OK.value(), "공지를 성공적으로 조회했습니다."),
     POST_LIKE_SUCCESS(HttpStatus.CREATED.value(),"좋아요를 성공적으로 등록했습니다."),
-    DELETE_LIKE_SUCCESS(HttpStatus.OK.value(),"좋아요를 성공적으로 취소했습니다.")
+    DELETE_LIKE_SUCCESS(HttpStatus.OK.value(),"좋아요를 성공적으로 취소했습니다."),
+    SAVE_NOTICE_SUCCESS(HttpStatus.CREATED.value(), "게시글 저장이 완료되었습니다.")
     ;
     private final int status;
     private final String message;

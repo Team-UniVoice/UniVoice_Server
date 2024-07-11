@@ -44,4 +44,11 @@ public class NoticeController {
         noticeService.deleteLike(noticeId, memberId);
         return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.DELETE_LIKE_SUCCESS));
     }
+
+    @PostMapping("/save/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<Void>> saveNotice(@PathVariable Long noticeId, @RequestHeader Long memberId) {
+        noticeService.saveNotice(noticeId, memberId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.SAVE_NOTICE_SUCCESS));
+    }
+
 }

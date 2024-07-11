@@ -11,8 +11,10 @@ import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.entity.NoticeImage;
 import sopt.univoice.domain.notice.entity.NoticeLike;
+import sopt.univoice.domain.notice.entity.SaveNotice;
 import sopt.univoice.domain.notice.repository.NoticeLikeRepository;
 import sopt.univoice.domain.notice.repository.NoticeRepository;
+import sopt.univoice.domain.notice.repository.SaveNoticeRepository;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.user.repository.UserRepository;
 import sopt.univoice.infra.common.exception.message.BusinessException;
@@ -31,6 +33,7 @@ public class NoticeService {
     private final UserRepository userRepository;
     private final S3Service s3Service;
     private final NoticeLikeRepository noticeLikeRepository;
+    private final SaveNoticeRepository saveNoticeRepository;
 
     @Transactional
     public NoticeRegisterResponseDto registerNotice(NoticeRegisterRequestDto noticeRegisterRequestDto, List<MultipartFile> files, Long memberId) {
@@ -131,6 +134,28 @@ public class NoticeService {
         noticeLikeRepository.delete(noticeLike);
 
         notice.decrementLike();
+        noticeRepository.save(notice);
+    }
+
+    @Transactional
+    public void saveNotice(Long noticeId, Long memberId) {
+        Notice notice = noticeRepository.findByIdOrThrow(noticeId);
+
+        Member member = userRepository.findByIdOrThrow(memberId);
+        // 추후 memberId 파라미터로 넣어 유저 검증
+
+        boolean alreadySaved = saveNoticeRepository.existsByNoticeAndMember(notice, member);
+        if (alreadySaved) {
+            throw new BusinessException(ErrorMessage.ALREADY_SAVED);
+        }
+
+        SaveNotice saveNotice = SaveNotice.builder()
+                                    .notice(notice)
+                                    .member(member)
+                                    .build();
+        saveNoticeRepository.save(saveNotice);
+
+        notice.incrementSave();
         noticeRepository.save(notice);
     }
 }

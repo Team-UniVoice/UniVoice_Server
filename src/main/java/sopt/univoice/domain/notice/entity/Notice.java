@@ -35,6 +35,9 @@ public class Notice extends BaseTimeEntity {
     @Column(name = "view_count", nullable = false)
     private Integer viewCount;
 
+    @Column(name = "save_count", nullable = false)
+    private Integer saveCount;
+
     @Column(name = "target", nullable = false, length = 30)
     private String target;
 
@@ -64,12 +67,22 @@ public class Notice extends BaseTimeEntity {
     public void decrementLike() {
         this.noticeLike--;
     }
+
+    public void incrementSave() {
+        this.saveCount++;
+    }
+
+    public void decrementSave() {
+        this.saveCount--;
+    }
+
     @Builder
-    public Notice(String title, String content, Integer noticeLike, Integer viewCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, Member member, List<NoticeImage> noticeImages) {
+    public Notice(String title, String content, Integer noticeLike, Integer viewCount, Integer saveCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, Member member, List<NoticeImage> noticeImages) {
         this.title = title;
         this.content = content;
         this.noticeLike = noticeLike;
         this.viewCount = viewCount;
+        this.saveCount = saveCount;
         this.target = target;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -78,7 +91,8 @@ public class Notice extends BaseTimeEntity {
         this.noticeImages = noticeImages;
     }
 
-    public static Notice of(String title, String content, Integer noticeLike, Integer viewCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, Member member, List<NoticeImage> noticeImages) {
-        return new Notice(title, content, noticeLike, viewCount, target, startTime, endTime, category, member, noticeImages);
+    public static Notice of(String title, String content, Integer noticeLike, Integer viewCount, Integer saveCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, Member member, List<NoticeImage> noticeImages) {
+        return new Notice(title, content, noticeLike, viewCount, saveCount,target, startTime, endTime, category, member, noticeImages);
     }
+
 }
