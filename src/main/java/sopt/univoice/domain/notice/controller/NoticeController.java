@@ -17,48 +17,48 @@ import sopt.univoice.infra.common.dto.SuccessStatusResponse;
 import java.util.List;
 
 @Controller
-@RequestMapping("/api/v1/notice")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class NoticeController {
 
     private final NoticeService noticeService;
     private static final String ACCESS_TOKEN = "access-token";
 
-    @PostMapping
+    @PostMapping("/notice")
     public ResponseEntity<SuccessStatusResponse<NoticeRegisterResponseDto>> registerNotice(@ModelAttribute NoticeRegisterRequestDto noticeRegisterRequestDto, @RequestPart(value = "file") List<MultipartFile> files, @RequestHeader Long memberId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.POST_NOTICE_SUCCESS, noticeService.registerNotice(noticeRegisterRequestDto, files, memberId)));
     }
 
-    @GetMapping("/{noticeId}")
+    @GetMapping("/notice/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<NoticeGetResponseDto>> getNotice(@PathVariable Long noticeId, @RequestHeader Long memberId) {
         return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.GET_NOTICE_SUCCESS, noticeService.getNotice(noticeId, memberId)));
     }
 
-    @PostMapping("/like/{noticeId}")
+    @PostMapping("/notice/like/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<Void>> postLike(@PathVariable Long noticeId, @RequestHeader Long memberId) {
         noticeService.postLike(noticeId, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.POST_LIKE_SUCCESS));
     }
 
-    @DeleteMapping("/like/{noticeId}")
+    @DeleteMapping("/notice/like/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<Void>> deleteLike(@PathVariable Long noticeId, @RequestHeader Long memberId) {
         noticeService.deleteLike(noticeId, memberId);
         return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.DELETE_LIKE_SUCCESS));
     }
 
-    @PostMapping("/save/{noticeId}")
+    @PostMapping("/notice/save/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<Void>> saveNotice(@PathVariable Long noticeId, @RequestHeader Long memberId) {
         noticeService.saveNotice(noticeId, memberId);
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.SAVE_NOTICE_SUCCESS));
     }
 
-    @DeleteMapping("/save/{noticeId}")
+    @DeleteMapping("/notice/save/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<Void>> deleteSave(@PathVariable Long noticeId, @RequestHeader Long memberId) {
         noticeService.deleteSave(noticeId, memberId);
         return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.DELETE_NOTICE_SUCCESS));
     }
 
-    @GetMapping("/saves")
+    @GetMapping("/notice/saves")
     public ResponseEntity<SuccessStatusResponse<List<SaveNoticeGetResponse>>> getSaveNotice(@RequestHeader Long memberId) {
         return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.GET_SAVE_NOICE_SUCCESS, noticeService.getSaveNotice(memberId)));
     }
