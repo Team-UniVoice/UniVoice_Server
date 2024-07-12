@@ -279,6 +279,42 @@ public class NoticeService {
         return new GetAllNoticesResponseDTO(quickScans, noticeDTOs);
     }
 
+    @Transactional
+    public GetUniversityNoticesResponseDTO getUniversityNoticeByUserUniversity() {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
 
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
+        String universityName = member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
+        String departmentName = member.getDepartmentName();
+
+        long universityNameCount = noticeRepository.countByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총학생회");
+        long collegeDepartmentCount = noticeRepository.countByMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(collegeDepartmentName, "단과대학학생회");
+        long departmentCount = noticeRepository.countByMemberDepartmentNameAndMemberAffiliationAffiliation(departmentName, "과학생회");
+
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총학생회");
+
+        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> new NoticeResponseDTO(
+                notice.getId(),
+                notice.getStartTime(),
+                notice.getEndTime(),
+                notice.getTitle(),
+                notice.getNoticeLike(),
+                (long) notice.getSaveNotices().size(),
+                notice.getCategory()
+        )).collect(Collectors.toList());
+
+        QuickScanResponseDTO quickScans = new QuickScanResponseDTO(
+                universityName,
+                universityNameCount,
+                collegeDepartmentName,
+                collegeDepartmentCount,
+                departmentName,
+                departmentCount
+        );
+
+        return new GetUniversityNoticesResponseDTO(quickScans, noticeResponseDTOs);
+    }
 }

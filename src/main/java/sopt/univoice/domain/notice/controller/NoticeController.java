@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import sopt.univoice.domain.auth.dto.MemberCreateRequest;
 import sopt.univoice.domain.auth.service.AuthService;
 import sopt.univoice.domain.notice.dto.GetAllNoticesResponseDTO;
+import sopt.univoice.domain.notice.dto.GetUniversityNoticesResponseDTO;
 import sopt.univoice.domain.notice.dto.NoticeCreateRequest;
 import sopt.univoice.domain.notice.dto.NoticeSaveDTO;
 import sopt.univoice.domain.notice.entity.Notice;
@@ -31,7 +32,6 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.CREATE_NOTICE_SUCCESS, null));
     }
 
-
     @PostMapping("/like/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<Object>> likeNotice(@PathVariable Long noticeId) {
 
@@ -47,8 +47,6 @@ public class NoticeController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SuccessStatusResponse.of(SuccessMessage.LIKE_CANCLE_NOTICE_SUCCESS, null));
     }
-
-
 
     @PostMapping("/save/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<Object>> saveNotice(@PathVariable Long noticeId) {
@@ -66,9 +64,6 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.SAVE_CANCLE_NOTICE_SUCCESS, null));
     }
 
-
-
-
     @GetMapping("/save/all")
     public ResponseEntity<SuccessStatusResponse<List<NoticeSaveDTO>>> getSaveNoticeByUser() {
 
@@ -85,7 +80,6 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.VIEW_NOTICE_SUCCESS, null));
     }
 
-
     @GetMapping("/all")
     public ResponseEntity<SuccessStatusResponse<Object>> getAllNoticeByUserUniversity() {
         GetAllNoticesResponseDTO response = noticeService.getAllNoticeByUserUniversity();
@@ -93,8 +87,12 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_NOTICE_SUCCESS, response));
     }
 
-
-
+    @GetMapping("/university")
+    public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity() {
+        GetUniversityNoticesResponseDTO response = noticeService.getUniversityNoticeByUserUniversity();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_UNIVERSITY_NOTICE_SUCCESS, response));
+    }
 
 
 }

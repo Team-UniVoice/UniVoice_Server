@@ -9,6 +9,11 @@ import java.util.List;
 public interface NoticeRepository extends JpaRepository<Notice, Long> {
     @Query("SELECT n FROM Notice n WHERE n.member.universityName = :universityName")
     List<Notice> findAllByMemberUniversityName(String universityName);
+
+    long countByMemberUniversityNameAndMemberAffiliationAffiliation(String universityName, String affiliation);
+    long countByMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(String collegeDepartmentName, String affiliation);
+    long countByMemberDepartmentNameAndMemberAffiliationAffiliation(String departmentName, String affiliation);
+    List<Notice> findByMemberUniversityNameAndMemberAffiliationAffiliation(String universityName, String affiliation);
 }
 
 
