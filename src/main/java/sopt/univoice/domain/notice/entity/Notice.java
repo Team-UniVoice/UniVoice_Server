@@ -37,6 +37,7 @@ public class Notice   extends BaseTimeEntity {
 
     private String category;
 
+    @Column(length = 1000)
     private String contentSummary;
 
 
@@ -61,7 +62,7 @@ public class Notice   extends BaseTimeEntity {
     private List<NoticeLike> noticeLikes;
 
     @Builder
-    public Notice(String title, String content, String target, LocalDateTime startTime, LocalDateTime endTime, Member member, String contentSummary) {
+    public Notice(String title, String content, String target, LocalDateTime startTime, LocalDateTime endTime, Member member, String contentSummary, String category) {
         this.title = title;
         this.content = content;
         this.target = target;
@@ -71,6 +72,7 @@ public class Notice   extends BaseTimeEntity {
         this.noticeLike = 0L;
         this.viewCount = 0L;
         this.contentSummary = contentSummary;
+        this.category = category;
     }
 
 
@@ -87,21 +89,6 @@ public class Notice   extends BaseTimeEntity {
         return viewCount;
     }
 
-    @Override
-    public String toString() {
-        return "Notice{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", noticeLike=" + noticeLike +
-                ", viewCount=" + viewCount +
-                ", target='" + target + '\'' +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                ", category='" + category + '\'' +
-                ", contentSummary='" + contentSummary + '\'' +
-                ", member=" + (member != null ? member.getId() : "null") +
-                '}';
-    }
+
 
 }

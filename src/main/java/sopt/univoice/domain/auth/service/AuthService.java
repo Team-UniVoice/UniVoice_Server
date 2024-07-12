@@ -19,6 +19,10 @@ import sopt.univoice.domain.auth.dto.MemberSignInRequest;
 import sopt.univoice.domain.auth.dto.UserLoginResponse;
 import sopt.univoice.domain.auth.repository.AuthRepository;
 import sopt.univoice.domain.auth.repository.CollegeDepartmentRepository;
+import sopt.univoice.domain.notice.entity.Notice;
+import sopt.univoice.domain.notice.entity.NoticeView;
+import sopt.univoice.domain.notice.repository.NoticeRepository;
+import sopt.univoice.domain.notice.repository.NoticeViewRepository;
 import sopt.univoice.domain.universityData.entity.CollegeDepartment;
 import sopt.univoice.domain.universityData.entity.Department;
 import sopt.univoice.domain.universityData.repository.DepartmentRepository;
@@ -56,6 +60,8 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final ObjectMapper objectMapper;
+    private final NoticeRepository noticeRepository;
+    private final NoticeViewRepository noticeViewRepository;
 
     public boolean isDuplicateEmail(CheckEmailRequest checkEmailRequest) {
         return authRepository.existsByEmail(checkEmailRequest.getEmail());
@@ -148,6 +154,20 @@ public class AuthService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+// NoticeView 엔티티 생성 및 저장
+        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(member.getUniversityName());
+        for (Notice notice : notices) {
+            NoticeView noticeView = NoticeView.builder()
+                    .notice(notice)
+                    .member(member)
+                    .readAt(false)
+                    .build();
+            noticeViewRepository.save(noticeView);
+        }
+
+
+
     }
 
 

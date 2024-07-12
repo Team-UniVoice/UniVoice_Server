@@ -66,6 +66,7 @@ public class NoticeService {
                 .endTime(noticeCreateRequest.getEndTime())
                 .member(member)
                 .contentSummary(summarizedContent)
+                .category("공지사항")  // category 값을 '공지사항'으로 설정
                 .build();
         noticeRepository.save(notice);
         System.out.println("Notice saved successfully with ID: " + notice.getId());
