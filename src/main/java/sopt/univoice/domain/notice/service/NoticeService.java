@@ -1,7 +1,6 @@
 package sopt.univoice.domain.notice.service;
 
 import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +22,7 @@ import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.external.S3Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,12 +48,17 @@ public class NoticeService {
 
         List<NoticeImage> noticeImages = uploadImages(files);
 
+        LocalDateTime startTime = noticeRegisterRequestDto.startTime() != null ? noticeRegisterRequestDto.startTime() : null;
+        LocalDateTime endTime = noticeRegisterRequestDto.endTime() != null ? noticeRegisterRequestDto.endTime() : null;
+        String target = noticeRegisterRequestDto.target() != null ? noticeRegisterRequestDto.target() : "";
+        // 대상, 일시가 null일 경우
+
         Notice notice = Notice.builder()
                             .title(noticeRegisterRequestDto.title())
                             .content(noticeRegisterRequestDto.content())
-                            .target(noticeRegisterRequestDto.target())
-                            .startTime(noticeRegisterRequestDto.startTime())
-                            .endTime(noticeRegisterRequestDto.endTime())
+                            .target(target)
+                            .startTime(startTime)
+                            .endTime(endTime)
                             .category("공지사항")
                             .member(member)
                             .noticeLike(0)

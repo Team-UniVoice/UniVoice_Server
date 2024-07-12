@@ -38,13 +38,13 @@ public class Notice extends BaseTimeEntity {
     @Column(name = "save_count", nullable = false)
     private Integer saveCount;
 
-    @Column(name = "target", nullable = false, length = 30)
+    @Column(name = "target", length = 30)
     private String target;
 
-    @Column(name = "start_time", nullable = false)
+    @Column(name = "start_time")
     private LocalDateTime startTime;
 
-    @Column(name = "end_time", nullable = false)
+    @Column(name = "end_time")
     private LocalDateTime endTime;
 
     @Column(name = "category", nullable = false)
