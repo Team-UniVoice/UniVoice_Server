@@ -5,13 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sopt.univoice.domain.auth.dto.MemberCreateRequest;
-import sopt.univoice.domain.auth.service.AuthService;
 import sopt.univoice.domain.notice.dto.GetAllNoticesResponseDTO;
-import sopt.univoice.domain.notice.dto.GetUniversityNoticesResponseDTO;
+import sopt.univoice.domain.notice.dto.GetMainNoticesResponseDTO;
 import sopt.univoice.domain.notice.dto.NoticeCreateRequest;
 import sopt.univoice.domain.notice.dto.NoticeSaveDTO;
-import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.service.NoticeService;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
@@ -89,7 +86,7 @@ public class NoticeController {
 
     @GetMapping("/university")
     public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity() {
-        GetUniversityNoticesResponseDTO response = noticeService.getUniversityNoticeByUserUniversity();
+        GetMainNoticesResponseDTO response = noticeService.getUniversityNoticeByUserUniversity();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_UNIVERSITY_NOTICE_SUCCESS, response));
     }
@@ -97,13 +94,20 @@ public class NoticeController {
 
     @GetMapping("/college-department")
     public ResponseEntity<SuccessStatusResponse<Object>> getCollegeDepartmentNoticeByUserUniversity() {
-        GetUniversityNoticesResponseDTO response = noticeService.getCollegeDepartmentNoticeByUserUniversity();
+        GetMainNoticesResponseDTO response = noticeService.getCollegeDepartmentNoticeByUserUniversity();
 
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_COLLEGE_NOTICE_SUCCESS, response));
     }
 
+    @GetMapping("/department")
+    public ResponseEntity<SuccessStatusResponse<Object>> getDepartmentNoticeByUserUniversity() {
+        GetMainNoticesResponseDTO response = noticeService.getDepartmentNoticeByUserUniversity();
 
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_DEPARTMENT_SUCCESS, response));
+    }
 
 }

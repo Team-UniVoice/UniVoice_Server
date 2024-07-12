@@ -1,7 +1,6 @@
 package sopt.univoice.domain.notice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +18,6 @@ import sopt.univoice.infra.external.S3Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -280,7 +278,7 @@ public class NoticeService {
     }
 
     @Transactional
-    public GetUniversityNoticesResponseDTO getUniversityNoticeByUserUniversity() {
+    public GetMainNoticesResponseDTO getUniversityNoticeByUserUniversity() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
         Member member = authRepository.findById(memberId)
@@ -315,7 +313,7 @@ public class NoticeService {
                 departmentCount
         );
 
-        return new GetUniversityNoticesResponseDTO(quickScans, noticeResponseDTOs);
+        return new GetMainNoticesResponseDTO(quickScans, noticeResponseDTOs);
     }
 
 
@@ -324,7 +322,7 @@ public class NoticeService {
 
 
     @Transactional
-    public GetUniversityNoticesResponseDTO getCollegeDepartmentNoticeByUserUniversity() {
+    public GetMainNoticesResponseDTO getCollegeDepartmentNoticeByUserUniversity() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
         Member member = authRepository.findById(memberId)
@@ -359,12 +357,49 @@ public class NoticeService {
                 departmentCount
         );
 
-        return new GetUniversityNoticesResponseDTO(quickScans, noticeResponseDTOs);
+        return new GetMainNoticesResponseDTO(quickScans, noticeResponseDTOs);
     }
 
 
 
+    @Transactional
+    public GetMainNoticesResponseDTO getDepartmentNoticeByUserUniversity() {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
 
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
+
+        String universityName = member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
+        String departmentName = member.getDepartmentName();
+
+        long universityNameCount = noticeRepository.countByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총학생회");
+        long collegeDepartmentCount = noticeRepository.countByMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(collegeDepartmentName, "단과대학학생회");
+        long departmentCount = noticeRepository.countByMemberDepartmentNameAndMemberAffiliationAffiliation(departmentName, "과학생회");
+
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "과학생회");
+
+        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> new NoticeResponseDTO(
+                notice.getId(),
+                notice.getStartTime(),
+                notice.getEndTime(),
+                notice.getTitle(),
+                notice.getNoticeLike(),
+                (long) notice.getSaveNotices().size(),
+                notice.getCategory()
+        )).collect(Collectors.toList());
+
+        QuickScanResponseDTO quickScans = new QuickScanResponseDTO(
+                universityName,
+                universityNameCount,
+                collegeDepartmentName,
+                collegeDepartmentCount,
+                departmentName,
+                departmentCount
+        );
+
+        return new GetMainNoticesResponseDTO(quickScans, noticeResponseDTOs);
+    }
 
 
 

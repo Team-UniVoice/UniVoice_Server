@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetUniversityNoticesResponseDTO {
+public class GetMainNoticesResponseDTO {
     private QuickScanResponseDTO quickScans;
     private List<NoticeResponseDTO> notices;
 }
