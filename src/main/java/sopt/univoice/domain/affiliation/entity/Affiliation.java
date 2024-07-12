@@ -29,7 +29,8 @@ public class Affiliation extends BaseTimeEntity {
 
     private String affiliationName;
 
-    private String affiliation; // 0.NULl 미승인 / 1. 일반/ 2. 학생회 / 3. 단과대학 / 4. 총학생회
+    @Enumerated(EnumType.STRING)
+    private Membership membership; // 0.NULl 미승인 / 1. 일반/ 2. 학생회 / 3. 단과대학 / 4. 총학생회
 
     private String affiliationCardImage;
 
@@ -40,15 +41,15 @@ public class Affiliation extends BaseTimeEntity {
 
 
     @Builder
-    public Affiliation(Role role, String affiliationName, String affiliation, String affiliationCardImage, String affiliationLogoImage) {
+    public Affiliation(Role role, String affiliationName, Membership membership, String affiliationCardImage, String affiliationLogoImage) {
         this.role = role;
         this.affiliationName = affiliationName;
-        this.affiliation = affiliation;
+        this.membership = membership;
         this.affiliationCardImage = affiliationCardImage;
         this.affiliationLogoImage = affiliationLogoImage;
     }
 
-    public static Affiliation of(Role role, String affiliationName, String affiliation, String affiliationCardImage, String affiliationLogoImage) {
-        return new Affiliation(role, affiliationName, affiliation, affiliationCardImage, affiliationLogoImage);
+    public static Affiliation of(Role role, String affiliationName, Membership membership, String affiliationCardImage, String affiliationLogoImage) {
+        return new Affiliation(role, affiliationName, membership, affiliationCardImage, affiliationLogoImage);
     }
 }
