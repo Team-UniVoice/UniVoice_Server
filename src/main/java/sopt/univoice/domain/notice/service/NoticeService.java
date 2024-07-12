@@ -23,6 +23,7 @@ import sopt.univoice.infra.external.S3Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,7 @@ public class NoticeService {
         if (member.getAffiliation().getRole() != Role.APPROVEADMIN) {
             throw new BusinessException(ErrorMessage.UNAUTHORIZED_EXCEPTION);
         }
+
 
         List<NoticeImage> noticeImages = uploadImages(files);
 
@@ -73,6 +75,10 @@ public class NoticeService {
     }
 
     private List<NoticeImage> uploadImages(List<MultipartFile> files) {
+        if (files == null || files.isEmpty()) {
+            return Collections.emptyList();
+        } // 파일이 null인 경우 빈 리스트 반환하도록
+
         return files.stream()
                    .map(file -> {
                        try {

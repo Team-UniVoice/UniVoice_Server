@@ -25,7 +25,7 @@ public class NoticeController {
     private static final String ACCESS_TOKEN = "access-token";
 
     @PostMapping("/notice")
-    public ResponseEntity<SuccessStatusResponse<NoticeRegisterResponseDto>> registerNotice(@ModelAttribute NoticeRegisterRequestDto noticeRegisterRequestDto, @RequestPart(value = "file") List<MultipartFile> files, @RequestHeader Long memberId) {
+    public ResponseEntity<SuccessStatusResponse<NoticeRegisterResponseDto>> registerNotice(@ModelAttribute NoticeRegisterRequestDto noticeRegisterRequestDto, @RequestPart(value = "file", required = false) List<MultipartFile> files, @RequestHeader Long memberId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.POST_NOTICE_SUCCESS, noticeService.registerNotice(noticeRegisterRequestDto, files, memberId)));
     }
 
