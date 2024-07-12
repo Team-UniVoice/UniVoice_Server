@@ -87,6 +87,21 @@ public class Notice   extends BaseTimeEntity {
         return viewCount;
     }
 
-
+    @Override
+    public String toString() {
+        return "Notice{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", noticeLike=" + noticeLike +
+                ", viewCount=" + viewCount +
+                ", target='" + target + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", category='" + category + '\'' +
+                ", contentSummary='" + contentSummary + '\'' +
+                ", member=" + (member != null ? member.getId() : "null") +
+                '}';
+    }
 
 }

@@ -416,6 +416,9 @@ public class NoticeService {
 
         List<Notice> notices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, affiliation);
 
+        System.out.println("Notices: " + notices);
+
+
         List<Notice> filteredNotices = notices.stream()
                 .filter(notice -> notice.getNoticeViews().stream()
                         .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
