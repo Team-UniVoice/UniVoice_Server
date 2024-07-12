@@ -62,4 +62,10 @@ public class NoticeController {
     public ResponseEntity<SuccessStatusResponse<List<SaveNoticeGetResponse>>> getSaveNotice(@RequestHeader Long memberId) {
         return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.GET_SAVE_NOICE_SUCCESS, noticeService.getSaveNotice(memberId)));
     }
+
+    @PatchMapping("/notice/view-count/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<Void>> increaseViewCount(@PathVariable Long noticeId, @RequestHeader Long memberId) {
+        noticeService.increaseViewCount(noticeId, memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.INCREASE_VIEW_COUNT_SUCCESS));
+    }
 }

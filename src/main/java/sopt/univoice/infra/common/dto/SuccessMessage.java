@@ -22,6 +22,7 @@ public enum SuccessMessage {
     SAVE_NOTICE_SUCCESS(HttpStatus.CREATED.value(), "공지 저장이 완료되었습니다."),
     DELETE_NOTICE_SUCCESS(HttpStatus.OK.value(),"공지 저장 취소가 완료되었습니다."),
     GET_SAVE_NOICE_SUCCESS(HttpStatus.OK.value(), "저장된 공지를 성공적으로 조회했습니다."),
+    INCREASE_VIEW_COUNT_SUCCESS(HttpStatus.OK.value(), "조회수를 증가하였습니다.")
     ;
     private final int status;
     private final String message;

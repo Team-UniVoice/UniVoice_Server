@@ -10,12 +10,10 @@ import sopt.univoice.domain.notice.dto.request.NoticeRegisterRequestDto;
 import sopt.univoice.domain.notice.dto.response.NoticeGetResponseDto;
 import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
 import sopt.univoice.domain.notice.dto.response.SaveNoticeGetResponse;
-import sopt.univoice.domain.notice.entity.Notice;
-import sopt.univoice.domain.notice.entity.NoticeImage;
-import sopt.univoice.domain.notice.entity.NoticeLike;
-import sopt.univoice.domain.notice.entity.SaveNotice;
+import sopt.univoice.domain.notice.entity.*;
 import sopt.univoice.domain.notice.repository.NoticeLikeRepository;
 import sopt.univoice.domain.notice.repository.NoticeRepository;
+import sopt.univoice.domain.notice.repository.NoticeViewRepository;
 import sopt.univoice.domain.notice.repository.SaveNoticeRepository;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.user.repository.UserRepository;
@@ -37,6 +35,7 @@ public class NoticeService {
     private final S3Service s3Service;
     private final NoticeLikeRepository noticeLikeRepository;
     private final SaveNoticeRepository saveNoticeRepository;
+    private final NoticeViewRepository noticeViewRepository;
 
     @Transactional
     public NoticeRegisterResponseDto registerNotice(NoticeRegisterRequestDto noticeRegisterRequestDto, List<MultipartFile> files, Long memberId) {
@@ -204,5 +203,24 @@ public class NoticeService {
                        return SaveNoticeGetResponse.of(notice, imageList);
                    })
                    .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void increaseViewCount(Long noticeId, Long memberId) {
+
+        Notice notice = noticeRepository.findByIdOrThrow(noticeId);
+
+        Member member = userRepository.findByIdOrThrow(memberId);
+
+        NoticeView noticeView = noticeViewRepository.findByNoticeAndMember(notice, member)
+                                    .orElseGet(() -> NoticeView.builder()
+                                                         .notice(notice)
+                                                         .member(member)
+                                                         .readAt(true)
+                                                         .build());
+        noticeViewRepository.save(noticeView);
+
+        notice.incrementViewCount();
+        noticeRepository.save(notice);
     }
 }

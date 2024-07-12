@@ -76,6 +76,10 @@ public class Notice extends BaseTimeEntity {
         this.saveCount--;
     }
 
+    public void incrementViewCount() {
+        this.viewCount++;
+    }
+
     @Builder
     public Notice(String title, String content, Integer noticeLike, Integer viewCount, Integer saveCount, String target, LocalDateTime startTime, LocalDateTime endTime, String category, Member member, List<NoticeImage> noticeImages) {
         this.title = title;
