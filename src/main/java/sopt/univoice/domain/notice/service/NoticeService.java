@@ -9,14 +9,8 @@ import sopt.univoice.domain.auth.PrincipalHandler;
 import sopt.univoice.domain.auth.repository.AuthRepository;
 import sopt.univoice.domain.notice.dto.NoticeCreateRequest;
 import sopt.univoice.domain.notice.dto.NoticeSaveDTO;
-import sopt.univoice.domain.notice.entity.Notice;
-import sopt.univoice.domain.notice.entity.NoticeImage;
-import sopt.univoice.domain.notice.entity.NoticeLike;
-import sopt.univoice.domain.notice.entity.SaveNotice;
-import sopt.univoice.domain.notice.repository.NoticeImageRepository;
-import sopt.univoice.domain.notice.repository.NoticeLikeRepository;
-import sopt.univoice.domain.notice.repository.NoticeRepository;
-import sopt.univoice.domain.notice.repository.SaveNoticeRepository;
+import sopt.univoice.domain.notice.entity.*;
+import sopt.univoice.domain.notice.repository.*;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.affiliation.entity.Role;
 import sopt.univoice.infra.common.exception.UnauthorizedException;
@@ -41,6 +35,7 @@ public class NoticeService {
     private final OpenAiService openAiService;
     private final NoticeLikeRepository noticeLikeRepository;
     private final SaveNoticeRepository saveNoticeRepository;
+    private final NoticeViewRepository noticeViewRepository;
 
     @Transactional
     public void createPost(NoticeCreateRequest noticeCreateRequest) {
@@ -88,6 +83,20 @@ public class NoticeService {
             noticeImageRepository.save(noticeImage);
             System.out.println("NoticeImage saved successfully with file name: " + fileName);
         }
+
+        // NoticeView 엔티티 생성 및 저장
+        String universityName = member.getUniversityName();
+        List<Member> universityMembers = authRepository.findByUniversityName(universityName);
+
+        for (Member universityMember : universityMembers) {
+            NoticeView noticeView = NoticeView.builder()
+                    .notice(notice)
+                    .member(universityMember)
+                    .readAt(false)
+                    .build();
+            noticeViewRepository.save(noticeView);
+        }
+
     }
 
     private String storeFile(MultipartFile file) {

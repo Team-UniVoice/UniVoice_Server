@@ -53,14 +53,15 @@ public class Member extends BaseTimeEntity {
 
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<NoticeLike> noticeLikes; // Member와 NoticeLike의 1:N 관계
+    private List<NoticeLike> noticeLikes;
 
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<SaveNotice> saveNotices; // Member와 NoticeLike의 1:N 관계
+    private List<SaveNotice> saveNotices;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<NoticeView> noticeView; // Member와 NoticeLike의 1:N 관계
+    private List<NoticeView> noticeView;
+
 
     @Builder
     public Member(Long admissionNumber, String name, String studentNumber, String email, String password, String studentCardImage,
