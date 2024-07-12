@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sopt.univoice.domain.auth.dto.MemberCreateRequest;
 import sopt.univoice.domain.auth.service.AuthService;
+import sopt.univoice.domain.notice.dto.GetAllNoticesResponseDTO;
 import sopt.univoice.domain.notice.dto.NoticeCreateRequest;
 import sopt.univoice.domain.notice.dto.NoticeSaveDTO;
 import sopt.univoice.domain.notice.entity.Notice;
@@ -83,6 +84,17 @@ public class NoticeController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SuccessStatusResponse.of(SuccessMessage.VIEW_NOTICE_SUCCESS, null));
     }
+
+
+    @GetMapping("/all")
+    public ResponseEntity<SuccessStatusResponse<Object>> getAllNoticeByUserUniversity() {
+        GetAllNoticesResponseDTO response = noticeService.getAllNoticeByUserUniversity();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_NOTICE_SUCCESS, response));
+    }
+
+
+
 
 
 }

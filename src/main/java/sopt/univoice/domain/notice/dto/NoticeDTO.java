@@ -1,18 +1,20 @@
 package sopt.univoice.domain.notice.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@NoArgsConstructor
 @AllArgsConstructor
-public class NoticeSaveDTO {
+public class NoticeDTO {
     private Long id;
-    private String title;
-    private Long viewCount;
-    private Long noticeLike;
-    private String category;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private String title;
+    private Long likeCount;
+    private Long saveCount;
+    private String category;
 }

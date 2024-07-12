@@ -34,7 +34,7 @@ public class Notice   extends BaseTimeEntity {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
-    private Long category;
+    private String category;
 
     private String contentSummary;
 

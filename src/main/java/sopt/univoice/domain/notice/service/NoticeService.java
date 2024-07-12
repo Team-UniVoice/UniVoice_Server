@@ -7,8 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sopt.univoice.domain.auth.PrincipalHandler;
 import sopt.univoice.domain.auth.repository.AuthRepository;
-import sopt.univoice.domain.notice.dto.NoticeCreateRequest;
-import sopt.univoice.domain.notice.dto.NoticeSaveDTO;
+import sopt.univoice.domain.notice.dto.*;
 import sopt.univoice.domain.notice.entity.*;
 import sopt.univoice.domain.notice.repository.*;
 import sopt.univoice.domain.user.entity.Member;
@@ -210,8 +209,6 @@ public class NoticeService {
                 .collect(Collectors.toList());
     }
 
-
-
     @Transactional
     public void viewCount(Long noticeId) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
@@ -234,7 +231,53 @@ public class NoticeService {
     }
 
 
+    @Transactional
+    public GetAllNoticesResponseDTO getAllNoticeByUserUniversity() {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
 
+        // 회원 정보 가져오기
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+
+        String universityName = member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
+        String departmentName = member.getDepartmentName();
+
+        // 공지사항 필터링
+        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
+
+        int universityNameCount = (int) notices.stream()
+                .filter(notice -> notice.getMember().getAffiliation().getAffiliation().equals("총학생회"))
+                .count();
+
+        int collegeDepartmentCount = (int) notices.stream()
+                .filter(notice -> notice.getMember().getAffiliation().getAffiliation().equals("단과대학학생회"))
+                .count();
+
+        int departmentCount = (int) notices.stream()
+                .filter(notice -> notice.getMember().getAffiliation().getAffiliation().equals("과학생회"))
+                .count();
+
+        QuickScanDTO quickScans = new QuickScanDTO(
+                universityName + " 총학생회", universityNameCount,
+                collegeDepartmentName + " 학생회", collegeDepartmentCount,
+                departmentName + " 학생회", departmentCount
+        );
+
+        List<NoticeDTO> noticeDTOs = notices.stream()
+                .map(notice -> new NoticeDTO(
+                        notice.getId(),
+                        notice.getStartTime(),
+                        notice.getEndTime(),
+                        notice.getTitle(),
+                        notice.getNoticeLike(),
+                        notice.getSaveNotices().stream().count(),
+                        notice.getCategory().toString() // assuming category is an enum or string
+                ))
+                .collect(Collectors.toList());
+
+        return new GetAllNoticesResponseDTO(quickScans, noticeDTOs);
+    }
 
 
 
