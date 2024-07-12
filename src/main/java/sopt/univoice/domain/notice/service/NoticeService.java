@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import sopt.univoice.domain.affiliation.entity.Membership;
 import sopt.univoice.domain.affiliation.entity.Role;
 import sopt.univoice.domain.notice.dto.request.NoticeRegisterRequestDto;
 import sopt.univoice.domain.notice.dto.response.NoticeGetResponseDto;
@@ -92,12 +93,14 @@ public class NoticeService {
 
         Member member = userRepository.findByIdOrThrow(memberId);
 
-        // 소속명 설정
         String writeAffiliation;
-        if ("총학생회".equals(member.getAffiliation().getAffiliation())) {
-            writeAffiliation = member.getAffiliation().getAffiliationName() + " 총 학생회";
-        } else if ("단과대학".equals(member.getAffiliation().getAffiliation()) || "학생회".equals(member.getAffiliation().getAffiliation())) {
-            writeAffiliation = member.getAffiliation().getAffiliationName() + " 학생회";
+
+        if (notice.getMember().getAffiliation().getMembership() == Membership.TOTALCOUNCIL) {
+            writeAffiliation = "총 학생회";
+        } else if (notice.getMember().getAffiliation().getMembership() == Membership.COLLEGE) {
+            writeAffiliation = "단과대학 학생회";
+        } else if (notice.getMember().getAffiliation().getMembership() == Membership.STUDENTCOUNCIL) {
+            writeAffiliation = "학과 학생회";
         } else {
             writeAffiliation = "소속을 찾을 수 없습니다";
         }
@@ -107,7 +110,7 @@ public class NoticeService {
                                      .collect(Collectors.toList());
 
         return NoticeGetResponseDto.of(notice, writeAffiliation, imageList);
-
+        // 세부 공지는 차피 메인홈을 거쳐 들어오는 것이므로 메인 홈에서 먼저 다니고 있는 대학교의 공지만 조회할 수 있도록 할 것이여서 그 로직은 여기선 구현 안함
     }
 
     @Transactional

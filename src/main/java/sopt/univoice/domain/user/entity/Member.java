@@ -54,7 +54,7 @@ public class Member extends BaseTimeEntity {
     private List<Notice> notices = new ArrayList<>();
 
     @Builder
-    public Member(Long admissionNumber, String name, String studentNumber, String email, String password, String studentCardImage, String collegeDepartmentName, String universityName, String departmentName) {
+    public Member(Long admissionNumber, String name, String studentNumber, String email, String password, String studentCardImage, String collegeDepartmentName, String universityName, String departmentName, Affiliation affiliation) {
         this.admissionNumber = admissionNumber;
         this.name = name;
         this.studentNumber = studentNumber;
@@ -64,9 +64,10 @@ public class Member extends BaseTimeEntity {
         this.collegeDepartmentName = collegeDepartmentName;
         this.universityName = universityName;
         this.departmentName = departmentName;
+        this.affiliation = affiliation;
     }
 
-    public static Member of(Long admissionNumber, String name, String studentNumber, String id, String password, String studentCardImage, String universityName, String collegeDepartmentName, String departmentName) {
-        return new Member(admissionNumber, name, studentNumber, id, password, studentCardImage, universityName, collegeDepartmentName, departmentName);
+    public static Member of(Long admissionNumber, String name, String studentNumber, String id, String password, String studentCardImage, String universityName, String collegeDepartmentName, String departmentName, Affiliation affiliation) {
+        return new Member(admissionNumber, name, studentNumber, id, password, studentCardImage, universityName, collegeDepartmentName, departmentName, affiliation);
     }
 }
