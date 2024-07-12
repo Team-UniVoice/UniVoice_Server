@@ -77,6 +77,15 @@ public class Notice   extends BaseTimeEntity {
         this.noticeLike = noticeLike;
     }
 
+    // 추가된 부분
+    public void setViewCount(Long viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    public Long getViewCount() {
+        return viewCount;
+    }
+
 
 
 }

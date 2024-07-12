@@ -34,6 +34,9 @@ public class NoticeView {
         this.member = member;
         this.readAt = readAt;
     }
-
+    // Setter for readAt
+    public void setReadAt(boolean readAt) {
+        this.readAt = readAt;
+    }
 
 }

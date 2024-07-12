@@ -76,7 +76,13 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.SAVE_ALL_NOTICE_SUCCESS, notices));
     }
 
+    @PostMapping("/view-count/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<Object>> viewCount(@PathVariable Long noticeId) {
 
+        noticeService.viewCount(noticeId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(SuccessStatusResponse.of(SuccessMessage.VIEW_NOTICE_SUCCESS, null));
+    }
 
 
 }
