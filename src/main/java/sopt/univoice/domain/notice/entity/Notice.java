@@ -24,6 +24,7 @@ public class Notice   extends BaseTimeEntity {
 
     private String title;
 
+    @Column(length = 1000)
     private String content;
 
     private Long noticeLike = 0L;
