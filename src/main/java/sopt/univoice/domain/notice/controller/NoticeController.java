@@ -116,6 +116,14 @@ public class NoticeController {
     }
 
 
+    @GetMapping("/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<NoticeDetailResponseDTO>> getNoticeById(@PathVariable Long noticeId) {
+        NoticeDetailResponseDTO response = noticeService.getNoticeById(noticeId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessStatusResponse.of(SuccessMessage.GET_Detail_NOTICE_SUCCESS, response));
+    }
+
+
 
 
 }

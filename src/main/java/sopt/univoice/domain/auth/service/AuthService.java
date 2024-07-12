@@ -166,11 +166,7 @@ public class AuthService {
             noticeViewRepository.save(noticeView);
         }
 
-
-
     }
-
-
 
     @Transactional
     public UserLoginResponse logineMember(
@@ -191,6 +187,9 @@ public class AuthService {
 
         return UserLoginResponse.of(accessToken, memberId.toString());
     }
+
+
+
 
 
 

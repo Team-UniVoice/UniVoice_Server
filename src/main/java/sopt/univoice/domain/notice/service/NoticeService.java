@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import sopt.univoice.domain.affiliation.entity.Affiliation;
 import sopt.univoice.domain.auth.PrincipalHandler;
 import sopt.univoice.domain.auth.repository.AuthRepository;
 import sopt.univoice.domain.notice.dto.*;
@@ -436,6 +437,36 @@ public class NoticeService {
         )).collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public NoticeDetailResponseDTO getNoticeById(Long noticeId) {
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
+
+        // notice의 member_id를 통해 Member를 가져옵니다.
+        Member member = notice.getMember();
+
+        // Member의 affiliation_id를 통해 Affiliation을 가져옵니다.
+        Affiliation affiliation = member.getAffiliation();
+
+        // Affiliation의 affiliation 값을 가져옵니다.
+        String writeAffiliation = affiliation.getAffiliation();
+
+        return new NoticeDetailResponseDTO(
+                notice.getId(),
+                notice.getTitle(),
+                notice.getContent(),
+                notice.getNoticeLike(),
+                notice.getViewCount(),
+                notice.getTarget(),
+                notice.getStartTime(),
+                notice.getEndTime(),
+                notice.getCategory(),
+                notice.getContentSummary(),
+                notice.getMember().getId(),
+                writeAffiliation, // 추가된 부분
+                notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList())
+        );
+    }
 
 
 }

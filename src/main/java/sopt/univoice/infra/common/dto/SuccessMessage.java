@@ -24,7 +24,8 @@ public enum SuccessMessage {
     GET_ALL_UNIVERSITY_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"총학생회 공지 조회에 성공하였습니다."),
     GET_ALL_COLLEGE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"단과대학 학생회 공지 조회에 성공하였습니다."),
     GET_ALL_DEPARTMENT_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"학과 학생회 공지 조회에 성공하였습니다."),
-    GET_QUICK_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"퀵스캔 공지 조회에 성공하였습니다.")
+    GET_QUICK_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"퀵스캔 공지 조회에 성공하였습니다."),
+    GET_Detail_NOTICE_SUCCESS(HttpStatus.OK.value(),"개별 공지 조회에 성공하였습니다.")
     ;
     private final int status;
     private final String message;
