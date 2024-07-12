@@ -14,6 +14,10 @@ public interface NoticeRepository extends JpaRepository<Notice, Long> {
     long countByMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(String collegeDepartmentName, String affiliation);
     long countByMemberDepartmentNameAndMemberAffiliationAffiliation(String departmentName, String affiliation);
     List<Notice> findByMemberUniversityNameAndMemberAffiliationAffiliation(String universityName, String affiliation);
+
+
+    @Query("SELECT n FROM Notice n WHERE n.member.universityName = :universityName AND n.member.affiliation.affiliation = :affiliation")
+    List<Notice> findByMemberUniversityNameAndAffiliationAffiliation(String universityName, String affiliation);
 }
 
 

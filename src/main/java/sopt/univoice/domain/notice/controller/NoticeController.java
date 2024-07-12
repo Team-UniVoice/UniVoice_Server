@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sopt.univoice.domain.notice.dto.GetAllNoticesResponseDTO;
-import sopt.univoice.domain.notice.dto.GetMainNoticesResponseDTO;
-import sopt.univoice.domain.notice.dto.NoticeCreateRequest;
-import sopt.univoice.domain.notice.dto.NoticeSaveDTO;
+import sopt.univoice.domain.notice.dto.*;
 import sopt.univoice.domain.notice.service.NoticeService;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
@@ -107,7 +104,17 @@ public class NoticeController {
 
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_DEPARTMENT_SUCCESS, response));
+                .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_DEPARTMENT_NOTICE_SUCCESS, response));
     }
+
+
+    @GetMapping("/quick")
+    public ResponseEntity<SuccessStatusResponse<List<QuickQueryNoticeDTO>>> getQuickNoticeByUserUniversity(@RequestParam String affiliation) {
+        List<QuickQueryNoticeDTO> response = noticeService.getQuickNoticeByUserUniversity(affiliation);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessStatusResponse.of(SuccessMessage.GET_QUICK_NOTICE_SUCCESS, response));
+    }
+
+
 
 }

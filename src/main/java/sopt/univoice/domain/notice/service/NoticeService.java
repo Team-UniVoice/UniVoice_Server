@@ -403,4 +403,35 @@ public class NoticeService {
 
 
 
+
+
+    @Transactional
+    public List<QuickQueryNoticeDTO> getQuickNoticeByUserUniversity(String affiliation) {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
+
+        String universityName = member.getUniversityName();
+
+        List<Notice> notices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, affiliation);
+
+        List<Notice> filteredNotices = notices.stream()
+                .filter(notice -> notice.getNoticeViews().stream()
+                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
+                .collect(Collectors.toList());
+
+        return filteredNotices.stream().map(notice -> new QuickQueryNoticeDTO(
+                notice.getId(),
+                notice.getStartTime(),
+                notice.getEndTime(),
+                notice.getTitle(),
+                notice.getNoticeLike(),
+                (long) notice.getSaveNotices().size(),
+                notice.getCategory()
+        )).collect(Collectors.toList());
+    }
+
+
+
 }
