@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import sopt.univoice.domain.notice.dto.request.NoticeRegisterRequestDto;
 import sopt.univoice.domain.notice.dto.response.NoticeGetResponseDto;
 import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
+import sopt.univoice.domain.notice.dto.response.SaveNoticeGetResponse;
 import sopt.univoice.domain.notice.service.NoticeService;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
@@ -30,7 +31,7 @@ public class NoticeController {
 
     @GetMapping("/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<NoticeGetResponseDto>> getNotice(@PathVariable Long noticeId, @RequestHeader Long memberId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.GET_NOICE_SUCCESS, noticeService.getNotice(noticeId, memberId)));
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.GET_NOTICE_SUCCESS, noticeService.getNotice(noticeId, memberId)));
     }
 
     @PostMapping("/like/{noticeId}")
@@ -51,4 +52,14 @@ public class NoticeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(SuccessStatusResponse.of(SuccessMessage.SAVE_NOTICE_SUCCESS));
     }
 
+    @DeleteMapping("/save/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<Void>> deleteSave(@PathVariable Long noticeId, @RequestHeader Long memberId) {
+        noticeService.deleteSave(noticeId, memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.DELETE_NOTICE_SUCCESS));
+    }
+
+    @GetMapping("/saves")
+    public ResponseEntity<SuccessStatusResponse<List<SaveNoticeGetResponse>>> getSaveNotice(@RequestHeader Long memberId) {
+        return ResponseEntity.status(HttpStatus.OK).body(SuccessStatusResponse.of(SuccessMessage.GET_SAVE_NOICE_SUCCESS, noticeService.getSaveNotice(memberId)));
+    }
 }

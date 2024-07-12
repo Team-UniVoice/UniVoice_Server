@@ -9,6 +9,7 @@ import sopt.univoice.domain.affiliation.entity.Role;
 import sopt.univoice.domain.notice.dto.request.NoticeRegisterRequestDto;
 import sopt.univoice.domain.notice.dto.response.NoticeGetResponseDto;
 import sopt.univoice.domain.notice.dto.response.NoticeRegisterResponseDto;
+import sopt.univoice.domain.notice.dto.response.SaveNoticeGetResponse;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.entity.NoticeImage;
 import sopt.univoice.domain.notice.entity.NoticeLike;
@@ -142,7 +143,7 @@ public class NoticeService {
         Member member = userRepository.findByIdOrThrow(memberId);
 
         NoticeLike noticeLike = noticeLikeRepository.findByNoticeAndMember(notice, member)
-                                    .orElseThrow(() -> new BusinessException(ErrorMessage.ALREADY_CANCELED));
+                                    .orElseThrow(() -> new BusinessException(ErrorMessage.NOT_LIKE));
 
         noticeLikeRepository.delete(noticeLike);
 
@@ -170,5 +171,38 @@ public class NoticeService {
 
         notice.incrementSave();
         noticeRepository.save(notice);
+    }
+
+    @Transactional
+    public void deleteSave(Long noticeId, Long memberId) {
+        Notice notice = noticeRepository.findByIdOrThrow(noticeId);
+
+        Member member = userRepository.findByIdOrThrow(memberId);
+
+        SaveNotice saveNotice = saveNoticeRepository.findByNoticeAndMember(notice, member)
+                                    .orElseThrow(() -> new BusinessException(ErrorMessage.NOT_SAVE));
+
+        saveNoticeRepository.delete(saveNotice);
+
+        notice.decrementSave();
+        noticeRepository.save(notice);
+    }
+
+    @Transactional
+    public List<SaveNoticeGetResponse> getSaveNotice(Long memberId) {
+
+        Member member = userRepository.findByIdOrThrow(memberId);
+
+        List<SaveNotice> saveNotices = saveNoticeRepository.findByMemberOrderByCreatedAtDesc(member);
+
+        return saveNotices.stream()
+                   .map(saveNotice -> {
+                       Notice notice = saveNotice.getNotice();
+                       List<String> imageList = notice.getNoticeImages().stream()
+                                                    .map(NoticeImage::getNoticeImage)
+                                                    .collect(Collectors.toList());
+                       return SaveNoticeGetResponse.of(notice, imageList);
+                   })
+                   .collect(Collectors.toList());
     }
 }
