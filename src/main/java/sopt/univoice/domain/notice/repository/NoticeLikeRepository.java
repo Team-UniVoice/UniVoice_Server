@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface NoticeLikeRepository extends JpaRepository<NoticeLike, Long> {
     Optional<NoticeLike> findByNoticeAndMember(Notice notice, Member member);
+
+    boolean existsByNoticeAndMember(Notice notice, Member member);
 }

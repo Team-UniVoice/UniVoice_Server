@@ -129,6 +129,12 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
 
+        // 이미 좋아요를 누른 것인지 확인
+        boolean alreadyLiked = noticeLikeRepository.existsByNoticeAndMember(notice, member);
+        if (alreadyLiked) {
+            throw new BusinessException(ErrorMessage.ALREADY_LIKED);
+        }
+
         // noticeLike를 1 증가시킵니다.
         notice.setNoticeLike(notice.getNoticeLike() + 1);
         noticeRepository.save(notice);
