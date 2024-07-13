@@ -487,17 +487,14 @@ public class NoticeService {
 
         return new NoticeDetailResponseDTO(
                 notice.getId(),
+                writeAffiliation,
                 notice.getTitle(),
-                notice.getContent(),
-                notice.getNoticeLike(),
-                notice.getViewCount(),
                 notice.getTarget(),
                 notice.getStartTime(),
                 notice.getEndTime(),
-                notice.getCategory(),
-                notice.getContentSummary(),
-                notice.getMember().getId(),
-                writeAffiliation, // 추가된 부분
+                notice.getContent(),
+                notice.getCreatedAt(),
+                notice.getViewCount(),
                 notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList())
         );
     }
