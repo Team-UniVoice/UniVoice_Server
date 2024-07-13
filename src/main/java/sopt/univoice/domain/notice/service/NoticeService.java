@@ -231,6 +231,38 @@ public class NoticeService {
     }
 
 
+
+    @Transactional
+    public List<QuickQueryNoticeDTO> getQuickNoticeByUserUniversity(String affiliation) {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
+
+        String universityName = member.getUniversityName();
+
+        List<Notice> notices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, affiliation);
+
+        System.out.println("Notices: " + notices);
+
+        List<Notice> filteredNotices = notices.stream()
+                .filter(notice -> notice.getNoticeViews().stream()
+                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
+                .collect(Collectors.toList());
+
+        System.out.println("Filtered Notices Count: " + filteredNotices.size());
+
+        return filteredNotices.stream().map(notice -> new QuickQueryNoticeDTO(
+                notice.getId(),
+                notice.getStartTime(),
+                notice.getEndTime(),
+                notice.getTitle(),
+                notice.getNoticeLike(),
+                (long) notice.getSaveNotices().size(),
+                notice.getCategory()
+        )).collect(Collectors.toList());
+    }
+
     @Transactional
     public GetAllNoticesResponseDTO getAllNoticeByUserUniversity() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
@@ -243,20 +275,34 @@ public class NoticeService {
         String collegeDepartmentName = member.getCollegeDepartmentName();
         String departmentName = member.getDepartmentName();
 
+
+        List<Notice> UniversityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
+        List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "단과대학학생회");
+        List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "과학생회");
+
+        List<Notice> filteredUniversityNotices = UniversityNotices.stream()
+                .filter(notice -> notice.getNoticeViews().stream()
+                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
+                .collect(Collectors.toList());
+
+        List<Notice> filteredCollegeNotices = collegeNotices.stream()
+                .filter(notice -> notice.getNoticeViews().stream()
+                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
+                .collect(Collectors.toList());
+
+        List<Notice> filteredDepartmentNotices = departmentNotices.stream()
+                .filter(notice -> notice.getNoticeViews().stream()
+                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
+                .collect(Collectors.toList());
+
         // 공지사항 필터링
         List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
 
-        int universityNameCount = (int) notices.stream()
-                .filter(notice -> notice.getMember().getAffiliation().getAffiliation().equals("총학생회"))
-                .count();
+        int universityNameCount = filteredUniversityNotices.size();
 
-        int collegeDepartmentCount = (int) notices.stream()
-                .filter(notice -> notice.getMember().getAffiliation().getAffiliation().equals("단과대학학생회"))
-                .count();
+        int collegeDepartmentCount = filteredCollegeNotices.size();
 
-        int departmentCount = (int) notices.stream()
-                .filter(notice -> notice.getMember().getAffiliation().getAffiliation().equals("과학생회"))
-                .count();
+        int departmentCount = filteredDepartmentNotices.size();
 
         QuickScanDTO quickScans = new QuickScanDTO(
                 universityName + " 총학생회", universityNameCount,
@@ -318,11 +364,6 @@ public class NoticeService {
         return new GetMainNoticesResponseDTO(quickScans, noticeResponseDTOs);
     }
 
-
-
-
-
-
     @Transactional
     public GetMainNoticesResponseDTO getCollegeDepartmentNoticeByUserUniversity() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
@@ -361,8 +402,6 @@ public class NoticeService {
 
         return new GetMainNoticesResponseDTO(quickScans, noticeResponseDTOs);
     }
-
-
 
     @Transactional
     public GetMainNoticesResponseDTO getDepartmentNoticeByUserUniversity() {
@@ -405,38 +444,6 @@ public class NoticeService {
 
 
 
-
-
-    @Transactional
-    public List<QuickQueryNoticeDTO> getQuickNoticeByUserUniversity(String affiliation) {
-        Long memberId = principalHandler.getUserIdFromPrincipal();
-
-        Member member = authRepository.findById(memberId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
-
-        String universityName = member.getUniversityName();
-
-        List<Notice> notices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, affiliation);
-
-        System.out.println("Notices: " + notices);
-
-
-        List<Notice> filteredNotices = notices.stream()
-                .filter(notice -> notice.getNoticeViews().stream()
-                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
-                .collect(Collectors.toList());
-
-        return filteredNotices.stream().map(notice -> new QuickQueryNoticeDTO(
-                notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
-                notice.getTitle(),
-                notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
-    }
-
     @Transactional(readOnly = true)
     public NoticeDetailResponseDTO getNoticeById(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
@@ -467,6 +474,5 @@ public class NoticeService {
                 notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList())
         );
     }
-
 
 }
