@@ -31,16 +31,16 @@ public class NoticeService {
     private final PrincipalHandler principalHandler;
     private final S3Service s3Service;
     private final OpenAiService openAiService;
+    private final NoticeViewRepository noticeViewRepository;
     private final NoticeLikeRepository noticeLikeRepository;
     private final SaveNoticeRepository saveNoticeRepository;
-    private final NoticeViewRepository noticeViewRepository;
 
     @Transactional
     public void createPost(NoticeCreateRequest noticeCreateRequest) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
         System.out.println("Authenticated Member ID: " + memberId);
         Member member = authRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+                            .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         System.out.println("Member Role: " + member.getAffiliation().getRole());
 
         String summarizedContent = null;
@@ -60,27 +60,36 @@ public class NoticeService {
 
         // Notice 엔티티 생성 및 저장
         Notice notice = Notice.builder()
-                .title(noticeCreateRequest.getTitle())
-                .content(noticeCreateRequest.getContent())
-                .target(noticeCreateRequest.getTarget())
-                .startTime(noticeCreateRequest.getStartTime())
-                .endTime(noticeCreateRequest.getEndTime())
-                .member(member)
-                .contentSummary(summarizedContent)
-                .category("공지사항")  // category 값을 '공지사항'으로 설정
-                .build();
+                            .title(noticeCreateRequest.getTitle())
+                            .content(noticeCreateRequest.getContent())
+                            .target(noticeCreateRequest.getTarget() != null ? noticeCreateRequest.getTarget() : "")
+                            .startTime(noticeCreateRequest.getStartTime() != null ? noticeCreateRequest.getStartTime() : null)
+                            .endTime(noticeCreateRequest.getEndTime() != null ? noticeCreateRequest.getEndTime() : null)
+                            .member(member)
+                            .contentSummary(summarizedContent)
+                            .category("공지사항")  // category 값을 '공지사항'으로 설정
+                            .build();
         noticeRepository.save(notice);
         System.out.println("Notice saved successfully with ID: " + notice.getId());
 
         // NoticeImage 엔티티 생성 및 저장
-        for (MultipartFile file : noticeCreateRequest.getStudentCardImages()) {
-            String fileName = storeFile(file); // 파일 저장 로직 필요
-            NoticeImage noticeImage = NoticeImage.builder()
-                    .notice(notice)
-                    .noticeImage(fileName)
-                    .build();
-            noticeImageRepository.save(noticeImage);
-            System.out.println("NoticeImage saved successfully with file name: " + fileName);
+        List<MultipartFile> files = noticeCreateRequest.getImageList();
+
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                try {
+                    String fileUrl = storeFile(file); // 파일 저장 로직 필요
+                    NoticeImage noticeImage = NoticeImage.builder()
+                                                  .notice(notice)
+                                                  .noticeImage(fileUrl)
+                                                  .build();
+                    noticeImageRepository.save(noticeImage);
+                    System.out.println("NoticeImage saved successfully with file URL: " + fileUrl);
+                } catch (Exception e) {
+                    System.err.println("Error saving NoticeImage: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
         }
 
         // NoticeView 엔티티 생성 및 저장
@@ -89,23 +98,23 @@ public class NoticeService {
 
         for (Member universityMember : universityMembers) {
             NoticeView noticeView = NoticeView.builder()
-                    .notice(notice)
-                    .member(universityMember)
-                    .readAt(false)
-                    .build();
+                                        .notice(notice)
+                                        .member(universityMember)
+                                        .readAt(false)
+                                        .build();
             noticeViewRepository.save(noticeView);
         }
-
     }
 
     private String storeFile(MultipartFile file) {
         try {
-            return s3Service.uploadImage("notice-images/", file);
+            String fileUrl = s3Service.uploadImage("notice-images/", file);
+            return fileUrl;
         } catch (IOException e) {
+            System.err.println("File upload failed: " + e.getMessage());
             throw new RuntimeException("파일 업로드에 실패했습니다.", e);
         }
     }
-
 
     @Transactional
     public void likeNotice(Long noticeId) {
