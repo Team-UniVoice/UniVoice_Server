@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sopt.univoice.domain.notice.dto.*;
+import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.service.NoticeService;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
@@ -75,24 +76,34 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.VIEW_NOTICE_SUCCESS, null));
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<SuccessStatusResponse<Object>> getAllNoticeByUserUniversity() {
-        GetAllNoticesResponseDTO response = noticeService.getAllNoticeByUserUniversity();
+    @GetMapping("/quickhead")
+    public ResponseEntity<SuccessStatusResponse<Object>> quickhead() {
+        QuickScanDTO response = noticeService.quickhead();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_NOTICE_SUCCESS, response));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<SuccessStatusResponse<Object>> getAllNoticeByUserUniversity() {
+        List<NoticeDTO> response = noticeService.getAllNoticeByUserUniversity();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_NOTICE_SUCCESS, response));
+    }
+
+
+
     @GetMapping("/university")
     public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity() {
-        GetMainNoticesResponseDTO response = noticeService.getUniversityNoticeByUserUniversity();
+        List<NoticeDTO> response = noticeService.getUniversityNoticeByUserUniversity();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_UNIVERSITY_NOTICE_SUCCESS, response));
     }
 
 
+
     @GetMapping("/college-department")
     public ResponseEntity<SuccessStatusResponse<Object>> getCollegeDepartmentNoticeByUserUniversity() {
-        GetMainNoticesResponseDTO response = noticeService.getCollegeDepartmentNoticeByUserUniversity();
+        List<NoticeResponseDTO> response = noticeService.getCollegeDepartmentNoticeByUserUniversity();
 
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -101,7 +112,7 @@ public class NoticeController {
 
     @GetMapping("/department")
     public ResponseEntity<SuccessStatusResponse<Object>> getDepartmentNoticeByUserUniversity() {
-        GetMainNoticesResponseDTO response = noticeService.getDepartmentNoticeByUserUniversity();
+        List<NoticeResponseDTO> response = noticeService.getDepartmentNoticeByUserUniversity();
 
 
         return ResponseEntity.status(HttpStatus.OK)
