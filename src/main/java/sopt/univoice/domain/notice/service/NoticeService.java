@@ -13,12 +13,15 @@ import sopt.univoice.domain.notice.repository.*;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.affiliation.entity.Role;
 import sopt.univoice.infra.common.exception.UnauthorizedException;
+import sopt.univoice.infra.common.exception.message.BusinessException;
 import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.external.OpenAiService;
 import sopt.univoice.infra.external.S3Service;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -169,6 +172,16 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
 
+        // 이미 저장한 공지인지 확인하는 부분 추가
+        boolean alreadySaved = saveNoticeRepository.existsByNoticeAndMember(notice, member);
+        if (alreadySaved) {
+            throw new BusinessException(ErrorMessage.ALREADY_SAVED);
+        }
+
+        // noticeSave를 1 증가시킵니다.
+        notice.setNoticeSave(notice.getNoticeSave() + 1);
+        noticeRepository.save(notice);
+
         // SaveNotice 엔티티 생성 및 저장
         SaveNotice saveNotice = SaveNotice.builder()
                 .notice(notice)
@@ -187,9 +200,13 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
 
+        // noticeSave를 1 감소시킵니다.
+        notice.setNoticeSave(notice.getNoticeSave() - 1);
+        noticeRepository.save(notice);
+
         // SaveNotice 엔티티 삭제
         SaveNotice saveNotice = saveNoticeRepository.findByNoticeAndMember(notice, member)
-                .orElseThrow(() -> new RuntimeException("저장된 공지사항이 존재하지 않습니다."));
+                                    .orElseThrow(() -> new RuntimeException("저장된 공지사항이 존재하지 않습니다."));
         saveNoticeRepository.delete(saveNotice);
     }
 
@@ -203,19 +220,21 @@ public class NoticeService {
         List<SaveNotice> saveNotices = saveNoticeRepository.findByMember(member);
 
         return saveNotices.stream()
-                .map(saveNotice -> {
-                    Notice notice = saveNotice.getNotice();
-                    return new NoticeSaveDTO(
-                            notice.getId(),
-                            notice.getTitle(),
-                            notice.getViewCount(),
-                            notice.getNoticeLike(),
-                            notice.getCategory(),
-                            notice.getStartTime(),
-                            notice.getEndTime()
-                    );
-                })
-                .collect(Collectors.toList());
+                   .map(saveNotice -> {
+                       Notice notice = saveNotice.getNotice();
+                       String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
+                       return new NoticeSaveDTO(
+                           notice.getId(),
+                           notice.getTitle(),
+                           notice.getViewCount(),
+                           notice.getNoticeLike(),
+                           notice.getCategory(),
+                           notice.getCreatedAt(),
+                           image
+                       );
+                   })
+                   .sorted(Comparator.comparing(NoticeSaveDTO::getCreatedAt))
+                   .collect(Collectors.toList());
     }
 
     @Transactional

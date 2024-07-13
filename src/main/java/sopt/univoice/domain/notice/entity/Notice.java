@@ -94,6 +94,9 @@ public class Notice   extends BaseTimeEntity {
         return viewCount;
     }
 
+    public void setNoticeSave(Long noticeSave) {
+        this.noticeSave = noticeSave;
+    }
 
 
 }

@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import sopt.univoice.domain.user.entity.Member;
+import sopt.univoice.infra.persistence.BaseTimeEntity;
 
 
 @Entity
 @Getter
 @NoArgsConstructor
-public class SaveNotice {
+public class SaveNotice extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
