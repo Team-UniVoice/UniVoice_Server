@@ -1,6 +1,7 @@
 package sopt.univoice.domain.auth.controller;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,7 +51,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SuccessStatusResponse<Void>> signUp(@ModelAttribute MemberCreateRequest memberCreateRequest) {
+    public ResponseEntity<SuccessStatusResponse<Void>> signUp(@Valid @ModelAttribute MemberCreateRequest memberCreateRequest) {
         System.out.println(memberCreateRequest.toString());
 
 
