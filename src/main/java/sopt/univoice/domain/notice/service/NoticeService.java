@@ -83,7 +83,7 @@ public class NoticeService {
         // NoticeImage 엔티티 생성 및 저장
         if (noticeCreateRequest.getNoticeImages() != null) {
             for (MultipartFile file : noticeCreateRequest.getNoticeImages()) {
-                String fileName = storeFile(file); // 파일 저장 로직 필요
+                String fileName = storeFile(file); // 파일 저장 로직 필요.
                 NoticeImage noticeImage = NoticeImage.builder()
                         .notice(notice)
                         .noticeImage(fileName)
