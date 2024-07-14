@@ -1,5 +1,6 @@
 package sopt.univoice.domain.notice.dto;
 
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -15,7 +16,7 @@ import java.util.Optional;
 //@AllArgsConstructor
 public class NoticeCreateRequest {
 
-
+    @Size(max = 100)
     private String title;
 
     private String content;
@@ -27,6 +28,6 @@ public class NoticeCreateRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime endTime;
 
-    private List<MultipartFile> studentCardImages;
-
+    @Size(max = 5)
+    private List<MultipartFile> imageList;
 }

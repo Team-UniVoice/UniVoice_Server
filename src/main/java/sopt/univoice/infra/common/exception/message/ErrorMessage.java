@@ -12,6 +12,8 @@ public enum ErrorMessage {
     EMAIL_DUPLICATE(HttpStatus.NO_CONTENT.value(), "이미 사용중인 이메일 입니다."),
     JWT_UNAUTHORIZED_EXCEPTION(HttpStatus.UNAUTHORIZED.value(), "사용자의 로그인 검증을 실패했습니다."),
     APPROVEADMIN_UNAUTHORIZED_EXCEPTION(HttpStatus.UNAUTHORIZED.value(), "승인된 관리자의 로그인 검증을 실패했습니다."),
+    ALREADY_SAVED(HttpStatus.CONFLICT.value(), "이미 저장한 공지입니다."),
+    ALREADY_LIKED(HttpStatus.CONFLICT.value(), "이미 좋아요한 공지입니다."),
     ;
     private final int status;
     private final String message;

@@ -1,6 +1,7 @@
 package sopt.univoice.domain.notice.controller;
 
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class NoticeController {
     private final NoticeService noticeService;
 
     @PostMapping("/create")
-    public ResponseEntity<SuccessStatusResponse<Void>> createPost(@ModelAttribute NoticeCreateRequest noticeCreateRequest) {
+    public ResponseEntity<SuccessStatusResponse<Void>> createPost(@Valid @ModelAttribute NoticeCreateRequest noticeCreateRequest) {
         System.out.println("createPost method called with request: " + noticeCreateRequest);
         noticeService.createPost(noticeCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)

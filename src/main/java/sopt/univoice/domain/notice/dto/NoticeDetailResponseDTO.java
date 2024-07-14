@@ -10,16 +10,13 @@ import java.util.List;
 @AllArgsConstructor
 public class NoticeDetailResponseDTO {
     private Long id;
+    private String writeAffiliation;
     private String title;
-    private String content;
-    private Long noticeLike;
-    private Long viewCount;
     private String target;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private String category;
-    private String contentSummary;
-    private Long memberId;
-    private String writeAffiliation;
+    private String content;
+    private LocalDateTime createdAt;
+    private Long viewCount;
     private List<String> noticeImages;
 }
