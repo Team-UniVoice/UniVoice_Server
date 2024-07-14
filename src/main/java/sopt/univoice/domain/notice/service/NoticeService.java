@@ -212,7 +212,9 @@ public class NoticeService {
                             notice.getNoticeLike(),
                             notice.getCategory(),
                             notice.getStartTime(),
-                            notice.getEndTime()
+                            notice.getEndTime(),
+                            saveNotice.getCreatedAt(), // 추가된 부분
+                            saveNotice.getUpdatedAt()  // 추가된 부분
                     );
                 })
                 .collect(Collectors.toList());
