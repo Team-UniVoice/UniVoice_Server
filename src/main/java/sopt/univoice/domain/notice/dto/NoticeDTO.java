@@ -17,4 +17,6 @@ public class NoticeDTO {
     private Long likeCount;
     private Long saveCount;
     private String category;
+    private LocalDateTime createdAt; // 추가된 부분
+    private LocalDateTime updatedAt; // 추가된 부분
 }

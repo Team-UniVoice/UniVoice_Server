@@ -544,7 +544,9 @@ public class NoticeService {
                     notice.getTitle(),
                     notice.getNoticeLike(),
                     (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                    notice.getCategory().toString(), // assuming category is an enum or string
+                    notice.getCreatedAt(),
+                    notice.getUpdatedAt()
             );
             noticeDTOs.add(noticeDTO);
         }
@@ -571,7 +573,9 @@ public class NoticeService {
                     notice.getTitle(),
                     notice.getNoticeLike(),
                     (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                    notice.getCategory().toString(), // assuming category is an enum or string
+                    notice.getCreatedAt(),
+                    notice.getUpdatedAt()
             );
             noticeDTOs.add(noticeDTO);
         }
@@ -598,7 +602,9 @@ public class NoticeService {
                     notice.getTitle(),
                     notice.getNoticeLike(),
                     (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                    notice.getCategory().toString(), // assuming category is an enum or string
+                    notice.getCreatedAt(),
+                    notice.getUpdatedAt()
             );
             noticeResponseDTOs.add(noticeDTO);
         }
