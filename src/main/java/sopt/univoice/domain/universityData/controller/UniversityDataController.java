@@ -33,7 +33,7 @@ public class UniversityDataController {
     public ResponseEntity<SuccessStatusResponse<List<String>>> getDepartmentNamesByUniversity(@RequestBody UniversityNameRequest universityNameRequest) {
         List<String> departmentNames = universityDataService.getDepartmentNamesByUniversity(universityNameRequest.getUniversityName());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(SuccessStatusResponse.of(SuccessMessage.UNIVERSITY_GET_SUCCESS, departmentNames));
+                .body(SuccessStatusResponse.of(SuccessMessage.DEPARTMENT_GET_SUCCESS, departmentNames));
     }
 
 
