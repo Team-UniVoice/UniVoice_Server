@@ -307,71 +307,53 @@ public class NoticeService {
         String collegeDepartmentName = member.getCollegeDepartmentName();
         String departmentName = member.getDepartmentName();
 
-        List<Notice> UniversityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
-        List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "단과대학학생회");
-        List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "과학생회");
+        // 총학생회 공지
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총 학생회");
+        // 단과대학 공지
+        List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학 학생회");
+        // 학과 공지
+        List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, departmentName, "학과 학생회");
 
-        List<Notice> filteredUniversityNotices = new ArrayList<>();
-        for (Notice notice : UniversityNotices) {
+        // 읽지 않은 총학생회 공지 필터링 및 카운트
+        int universityNameCount = 0;
+        for (Notice notice : universityNotices) {
             for (NoticeView noticeView : notice.getNoticeViews()) {
                 if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredUniversityNotices.add(notice);
+                    universityNameCount++;
                     break;
                 }
             }
         }
 
-        List<Notice> filteredCollegeNotices = new ArrayList<>();
+        // 읽지 않은 단과대학 공지 필터링 및 카운트
+        int collegeDepartmentCount = 0;
         for (Notice notice : collegeNotices) {
             for (NoticeView noticeView : notice.getNoticeViews()) {
                 if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredCollegeNotices.add(notice);
+                    collegeDepartmentCount++;
                     break;
                 }
             }
         }
 
-        List<Notice> filteredDepartmentNotices = new ArrayList<>();
+        // 읽지 않은 학과 공지 필터링 및 카운트
+        int departmentCount = 0;
         for (Notice notice : departmentNotices) {
             for (NoticeView noticeView : notice.getNoticeViews()) {
                 if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredDepartmentNotices.add(notice);
+                    departmentCount++;
                     break;
                 }
             }
         }
 
-        // 공지사항 필터링
-
-        int universityNameCount = filteredUniversityNotices.size();
-        int collegeDepartmentCount = filteredCollegeNotices.size();
-        int departmentCount = filteredDepartmentNotices.size();
-
-        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
-
-
         QuickScanDTO quickScans = new QuickScanDTO(
-                universityName + " 총학생회", universityNameCount,
-                collegeDepartmentName + " 학생회", collegeDepartmentCount,
-                departmentName + " 학생회", departmentCount
+            universityName + " 총학생회", universityNameCount,
+            collegeDepartmentName + " 학생회", collegeDepartmentCount,
+            departmentName + " 학생회", departmentCount
         );
 
-        List<NoticeDTO> noticeDTOs = new ArrayList<>();
-        for (Notice notice : notices) {
-            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
-            NoticeDTO noticeDTO = new NoticeDTO(
-                notice.getId(),
-                notice.getCreatedAt(),
-                notice.getTitle(),
-                notice.getNoticeLike(),
-                notice.getViewCount(),
-                notice.getCategory(),
-                image
-            );
-            noticeDTOs.add(noticeDTO);
-        }
-
-        return  quickScans;
+        return quickScans;
     }
 
     @Transactional
