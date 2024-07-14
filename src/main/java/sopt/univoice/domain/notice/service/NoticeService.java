@@ -18,7 +18,7 @@ import sopt.univoice.infra.common.exception.UnauthorizedException;
 import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.external.OpenAiService;
 import sopt.univoice.infra.external.S3Service;
-
+import java.util.Comparator;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -554,9 +554,8 @@ public class NoticeService {
         return quickScans;
     }
 
-
     @Transactional
-    public List<NoticeDTO>  getAllNoticeByUserUniversity() {
+    public List<NoticeDTO> getAllNoticeByUserUniversity() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
         Member member = authRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
@@ -580,7 +579,10 @@ public class NoticeService {
             noticeDTOs.add(noticeDTO);
         }
 
-        return  noticeDTOs;
+        // Sort the list based on createdAt in descending order
+        noticeDTOs.sort(Comparator.comparing(NoticeDTO::getCreatedAt));
+
+        return noticeDTOs;
     }
 
     @Transactional
@@ -632,7 +634,9 @@ public class NoticeService {
                 notice.getTitle(),
                 notice.getNoticeLike(),
                 (long) notice.getSaveNotices().size(),
-                notice.getCategory()
+                notice.getCategory(),
+                notice.getCreatedAt(),
+                notice.getUpdatedAt()
         )).collect(Collectors.toList());
 
 
@@ -658,7 +662,10 @@ public class NoticeService {
                 notice.getTitle(),
                 notice.getNoticeLike(),
                 (long) notice.getSaveNotices().size(),
-                notice.getCategory()
+                notice.getCategory(),
+                notice.getCreatedAt(),
+                notice.getUpdatedAt()
+
         )).collect(Collectors.toList());
 
 
