@@ -1,14 +1,12 @@
 package sopt.univoice.domain.auth.dto;
 
 public record UserLoginResponse(
-        String accessToken,
-        String userId
+        String accessToken
 ) {
 
     public static UserLoginResponse of(
-            String accessToken,
-            String userId
+            String accessToken
     ) {
-        return new UserLoginResponse(accessToken, userId);
+        return new UserLoginResponse(accessToken);
     }
 }

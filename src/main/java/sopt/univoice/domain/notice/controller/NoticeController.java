@@ -79,7 +79,7 @@ public class NoticeController {
     public ResponseEntity<SuccessStatusResponse<Object>> quickhead() {
         QuickScanDTO response = noticeService.quickhead();
         return ResponseEntity.status(HttpStatus.OK)
-                .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_NOTICE_SUCCESS, response));
+                .body(SuccessStatusResponse.of(SuccessMessage.GET_QUCIK_HEAD_SUCCESS, response));
     }
 
     @GetMapping("/all")

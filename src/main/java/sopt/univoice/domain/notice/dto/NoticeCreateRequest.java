@@ -27,6 +27,6 @@ public class NoticeCreateRequest {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime endTime;
 
-    private List<MultipartFile> studentCardImages;
+    private List<MultipartFile> noticeImages;
 
 }

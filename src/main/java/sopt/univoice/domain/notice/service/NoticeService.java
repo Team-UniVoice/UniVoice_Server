@@ -1,10 +1,12 @@
 package sopt.univoice.domain.notice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sopt.univoice.domain.affiliation.entity.Affiliation;
+import sopt.univoice.domain.affiliation.repository.AffiliationRepository;
 import sopt.univoice.domain.auth.PrincipalHandler;
 import sopt.univoice.domain.auth.repository.AuthRepository;
 import sopt.univoice.domain.notice.dto.*;
@@ -16,11 +18,14 @@ import sopt.univoice.infra.common.exception.UnauthorizedException;
 import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.external.OpenAiService;
 import sopt.univoice.infra.external.S3Service;
+import java.util.Comparator;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +40,8 @@ public class NoticeService {
     private final NoticeLikeRepository noticeLikeRepository;
     private final SaveNoticeRepository saveNoticeRepository;
     private final NoticeViewRepository noticeViewRepository;
+    @Autowired
+    private AffiliationRepository affiliationRepository;
 
     @Transactional
     public void createPost(NoticeCreateRequest noticeCreateRequest) {
@@ -74,14 +81,16 @@ public class NoticeService {
         System.out.println("Notice saved successfully with ID: " + notice.getId());
 
         // NoticeImage 엔티티 생성 및 저장
-        for (MultipartFile file : noticeCreateRequest.getStudentCardImages()) {
-            String fileName = storeFile(file); // 파일 저장 로직 필요
-            NoticeImage noticeImage = NoticeImage.builder()
-                    .notice(notice)
-                    .noticeImage(fileName)
-                    .build();
-            noticeImageRepository.save(noticeImage);
-            System.out.println("NoticeImage saved successfully with file name: " + fileName);
+        if (noticeCreateRequest.getNoticeImages() != null) {
+            for (MultipartFile file : noticeCreateRequest.getNoticeImages()) {
+                String fileName = storeFile(file); // 파일 저장 로직 필요.
+                NoticeImage noticeImage = NoticeImage.builder()
+                        .notice(notice)
+                        .noticeImage(fileName)
+                        .build();
+                noticeImageRepository.save(noticeImage);
+                System.out.println("NoticeImage saved successfully with file name: " + fileName);
+            }
         }
 
         // NoticeView 엔티티 생성 및 저장
@@ -96,7 +105,6 @@ public class NoticeService {
                     .build();
             noticeViewRepository.save(noticeView);
         }
-
     }
 
     private String storeFile(MultipartFile file) {
@@ -204,7 +212,9 @@ public class NoticeService {
                             notice.getNoticeLike(),
                             notice.getCategory(),
                             notice.getStartTime(),
-                            notice.getEndTime()
+                            notice.getEndTime(),
+                            saveNotice.getCreatedAt(), // 추가된 부분
+                            saveNotice.getUpdatedAt()  // 추가된 부분
                     );
                 })
                 .collect(Collectors.toList());
@@ -253,16 +263,22 @@ public class NoticeService {
 
         System.out.println("Filtered Notices Count: " + filteredNotices.size());
 
-        return filteredNotices.stream().map(notice -> new QuickQueryNoticeDTO(
-                notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
-                notice.getTitle(),
-                notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
+        return filteredNotices.stream()
+                .map(notice -> new QuickQueryNoticeDTO(
+                        notice.getId(),
+                        notice.getStartTime(),
+                        notice.getEndTime(),
+                        notice.getTitle(),
+                        notice.getNoticeLike(),
+                        (long) notice.getSaveNotices().size(),
+                        notice.getCategory(),
+                        notice.getCreatedAt(),
+                        notice.getUpdatedAt()
+                ))
+                .sorted(Comparator.comparing(QuickQueryNoticeDTO::getCreatedAt)) // 오름차순 정렬
+                .collect(Collectors.toList());
     }
+
 
     @Transactional
     public QuickScanDTO quickhead() {
@@ -274,54 +290,82 @@ public class NoticeService {
         String collegeDepartmentName = member.getCollegeDepartmentName();
         String departmentName = member.getDepartmentName();
 
-        List<Notice> UniversityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
         List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "단과대학학생회");
         List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "과학생회");
 
+        String universityLogoImage = null;
+        String collegeDepartmentLogoImage = null;
+        String departmentLogoImage = null;
+
+        // '총학생회'에 대한 로고 이미지 가져오기
+        Affiliation universityAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("총학생회", universityName);
+        if (universityAffiliation != null) {
+            universityLogoImage = universityAffiliation.getAffiliationLogoImage();
+        }
+
+        // '단과대학학생회'에 대한 로고 이미지 가져오기
+        Affiliation collegeAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("단과대학학생회", universityName);
+        if (collegeAffiliation != null) {
+            collegeDepartmentLogoImage = collegeAffiliation.getAffiliationLogoImage();
+        }
+
+        // '과학생회'에 대한 로고 이미지 가져오기
+        Affiliation departmentAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("과학생회", universityName);
+        if (departmentAffiliation != null) {
+            departmentLogoImage = departmentAffiliation.getAffiliationLogoImage();
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
         List<Notice> filteredUniversityNotices = new ArrayList<>();
-        for (Notice notice : UniversityNotices) {
-            for (NoticeView noticeView : notice.getNoticeViews()) {
-                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredUniversityNotices.add(notice);
-                    break;
+        for (Notice notice : universityNotices) {
+            if (notice.getCreatedAt().isAfter(now.minus(7, ChronoUnit.DAYS))) {
+                for (NoticeView noticeView : notice.getNoticeViews()) {
+                    if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+                        filteredUniversityNotices.add(notice);
+                        break;
+                    }
                 }
             }
         }
 
         List<Notice> filteredCollegeNotices = new ArrayList<>();
         for (Notice notice : collegeNotices) {
-            for (NoticeView noticeView : notice.getNoticeViews()) {
-                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredCollegeNotices.add(notice);
-                    break;
+            if (notice.getCreatedAt().isAfter(now.minus(7, ChronoUnit.DAYS))) {
+                for (NoticeView noticeView : notice.getNoticeViews()) {
+                    if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+                        filteredCollegeNotices.add(notice);
+                        break;
+                    }
                 }
             }
         }
 
         List<Notice> filteredDepartmentNotices = new ArrayList<>();
         for (Notice notice : departmentNotices) {
-            for (NoticeView noticeView : notice.getNoticeViews()) {
-                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredDepartmentNotices.add(notice);
-                    break;
+            if (notice.getCreatedAt().isAfter(now.minus(7, ChronoUnit.DAYS))) {
+                for (NoticeView noticeView : notice.getNoticeViews()) {
+                    if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+                        filteredDepartmentNotices.add(notice);
+                        break;
+                    }
                 }
             }
         }
 
         // 공지사항 필터링
-
         int universityNameCount = filteredUniversityNotices.size();
         int collegeDepartmentCount = filteredCollegeNotices.size();
         int departmentCount = filteredDepartmentNotices.size();
 
-        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
-
-
         QuickScanDTO quickScans = new QuickScanDTO(
-                universityName + " 총학생회", universityNameCount,
-                collegeDepartmentName + " 학생회", collegeDepartmentCount,
-                departmentName + " 학생회", departmentCount
+                universityName + " 총학생회", universityNameCount, universityLogoImage,
+                collegeDepartmentName + " 학생회", collegeDepartmentCount, collegeDepartmentLogoImage,
+                departmentName + " 학생회", departmentCount, departmentLogoImage
         );
+
+        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
 
         List<NoticeDTO> noticeDTOs = new ArrayList<>();
         for (Notice notice : notices) {
@@ -332,16 +376,18 @@ public class NoticeService {
                     notice.getTitle(),
                     notice.getNoticeLike(),
                     (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                    notice.getCategory().toString(), // assuming category is an enum or string
+                    notice.getCreatedAt(),
+                    notice.getUpdatedAt()
             );
             noticeDTOs.add(noticeDTO);
         }
 
-        return  quickScans;
+        return quickScans;
     }
 
     @Transactional
-    public List<NoticeDTO>  getAllNoticeByUserUniversity() {
+    public List<NoticeDTO> getAllNoticeByUserUniversity() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
         Member member = authRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
@@ -358,12 +404,17 @@ public class NoticeService {
                     notice.getTitle(),
                     notice.getNoticeLike(),
                     (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                    notice.getCategory().toString(), // assuming category is an enum or string
+                    notice.getCreatedAt(),
+                    notice.getUpdatedAt()
             );
             noticeDTOs.add(noticeDTO);
         }
 
-        return  noticeDTOs;
+        // Sort the list based on createdAt in descending order
+        noticeDTOs.sort(Comparator.comparing(NoticeDTO::getCreatedAt));
+
+        return noticeDTOs;
     }
 
     @Transactional
@@ -385,11 +436,13 @@ public class NoticeService {
                     notice.getTitle(),
                     notice.getNoticeLike(),
                     (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                    notice.getCategory().toString(), // assuming category is an enum or string
+                    notice.getCreatedAt(),
+                    notice.getUpdatedAt()
             );
             noticeResponseDTOs.add(noticeDTO);
         }
-
+        noticeResponseDTOs.sort(Comparator.comparing(NoticeDTO::getCreatedAt));
 
 
         return  noticeResponseDTOs;
@@ -406,15 +459,21 @@ public class NoticeService {
 
         List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "단과대학학생회");
 
-        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> new NoticeResponseDTO(
-                notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
-                notice.getTitle(),
-                notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
+        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream()
+                .map(notice -> new NoticeResponseDTO(
+                        notice.getId(),
+                        notice.getStartTime(),
+                        notice.getEndTime(),
+                        notice.getTitle(),
+                        notice.getNoticeLike(),
+                        (long) notice.getSaveNotices().size(),
+                        notice.getCategory(),
+                        notice.getCreatedAt(),
+                        notice.getUpdatedAt()
+                ))
+                .sorted(Comparator.comparing(NoticeResponseDTO::getCreatedAt)) // 오름차순 정렬
+                .collect(Collectors.toList());
+
 
 
 
@@ -432,15 +491,20 @@ public class NoticeService {
 
         List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "과학생회");
 
-        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> new NoticeResponseDTO(
-                notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
-                notice.getTitle(),
-                notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
+        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream()
+                .map(notice -> new NoticeResponseDTO(
+                        notice.getId(),
+                        notice.getStartTime(),
+                        notice.getEndTime(),
+                        notice.getTitle(),
+                        notice.getNoticeLike(),
+                        (long) notice.getSaveNotices().size(),
+                        notice.getCategory(),
+                        notice.getCreatedAt(),
+                        notice.getUpdatedAt()
+                ))
+                .sorted(Comparator.comparing(NoticeResponseDTO::getCreatedAt)) // 오름차순 정렬
+                .collect(Collectors.toList());
 
 
 
@@ -474,7 +538,9 @@ public class NoticeService {
                 notice.getContentSummary(),
                 notice.getMember().getId(),
                 writeAffiliation, // 추가된 부분
-                notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList())
+                notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList()),
+                notice.getCreatedAt(),
+                notice.getUpdatedAt()
         );
     }
 

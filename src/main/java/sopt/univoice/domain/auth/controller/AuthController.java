@@ -38,15 +38,12 @@ public class AuthController {
 
 
     @PostMapping("/signin")
-    public ResponseEntity<UserLoginResponse> signIn(@RequestBody MemberSignInRequest memberSignInRequest) {
+    public ResponseEntity<SuccessStatusResponse<UserLoginResponse>>signIn(@RequestBody MemberSignInRequest memberSignInRequest) {
 
         UserLoginResponse userLoginResponse = authService.logineMember(memberSignInRequest);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .header("Location", userLoginResponse.userId())
-                .body(
-                        userLoginResponse
-                );
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(SuccessStatusResponse.of(SuccessMessage.SIGNIN_SUCCESS, userLoginResponse));
     }
 
     @PostMapping("/signup")
