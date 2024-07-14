@@ -81,14 +81,16 @@ public class NoticeService {
         System.out.println("Notice saved successfully with ID: " + notice.getId());
 
         // NoticeImage 엔티티 생성 및 저장
-        for (MultipartFile file : noticeCreateRequest.getNoticeImages()) {
-            String fileName = storeFile(file); // 파일 저장 로직 필요
-            NoticeImage noticeImage = NoticeImage.builder()
-                    .notice(notice)
-                    .noticeImage(fileName)
-                    .build();
-            noticeImageRepository.save(noticeImage);
-            System.out.println("NoticeImage saved successfully with file name: " + fileName);
+        if (noticeCreateRequest.getNoticeImages() != null) {
+            for (MultipartFile file : noticeCreateRequest.getNoticeImages()) {
+                String fileName = storeFile(file); // 파일 저장 로직 필요
+                NoticeImage noticeImage = NoticeImage.builder()
+                        .notice(notice)
+                        .noticeImage(fileName)
+                        .build();
+                noticeImageRepository.save(noticeImage);
+                System.out.println("NoticeImage saved successfully with file name: " + fileName);
+            }
         }
 
         // NoticeView 엔티티 생성 및 저장
@@ -103,7 +105,6 @@ public class NoticeService {
                     .build();
             noticeViewRepository.save(noticeView);
         }
-
     }
 
     private String storeFile(MultipartFile file) {
