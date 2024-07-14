@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class NoticeResponseDTO {
     private Long id;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private LocalDateTime createdAt;
     private String title;
     private Long likeCount;
-    private Long saveCount;
+    private Long viewCount;
     private String category;
+    private String image;
 }

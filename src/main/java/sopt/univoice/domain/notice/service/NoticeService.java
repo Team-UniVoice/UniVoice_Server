@@ -412,7 +412,9 @@ public class NoticeService {
 
         String universityName = member.getUniversityName();
 
-        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총학생회");
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총 학생회");
+        // 최신순 정렬
+        universityNotices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
 
         List<NoticeDTO> noticeResponseDTOs = new ArrayList<>();
         for (Notice notice : universityNotices) {
@@ -424,7 +426,7 @@ public class NoticeService {
                 notice.getNoticeLike(),
                 notice.getViewCount(),
                 notice.getCategory(),
-                image // assuming category is an enum or string
+                image
             );
             noticeResponseDTOs.add(noticeDTO);
         }
@@ -442,21 +444,25 @@ public class NoticeService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         String universityName = member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
 
-        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "단과대학학생회");
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학 학생회");
 
-        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> new NoticeResponseDTO(
+        // 최신순 정렬
+        universityNotices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
+
+        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> {
+            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
+            return new NoticeResponseDTO(
                 notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
+                notice.getCreatedAt(),
                 notice.getTitle(),
                 notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
-
-
-
+                notice.getViewCount(),
+                notice.getCategory(),
+                image
+            );
+        }).collect(Collectors.toList());
         return noticeResponseDTOs;
     }
 
@@ -468,22 +474,27 @@ public class NoticeService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         String universityName = member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
+        String departmentName = member.getDepartmentName();
 
-        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "과학생회");
+        List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, departmentName, "학과 학생회");
 
-        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> new NoticeResponseDTO(
+        // 최신순 정렬
+        departmentNotices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
+
+        List<NoticeResponseDTO> noticeResponseDTOs = departmentNotices.stream().map(notice -> {
+            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
+            return new NoticeResponseDTO(
                 notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
+                notice.getCreatedAt(),
                 notice.getTitle(),
                 notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
-
-
-
-        return     noticeResponseDTOs;
+                notice.getViewCount(),
+                notice.getCategory(),
+                image
+            );
+        }).collect(Collectors.toList());
+        return noticeResponseDTOs;
     }
 
     @Transactional(readOnly = true)
