@@ -263,17 +263,20 @@ public class NoticeService {
 
         System.out.println("Filtered Notices Count: " + filteredNotices.size());
 
-        return filteredNotices.stream().map(notice -> new QuickQueryNoticeDTO(
-                notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
-                notice.getTitle(),
-                notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory(),
-                notice.getCreatedAt(),
-                notice.getUpdatedAt()
-        )).collect(Collectors.toList());
+        return filteredNotices.stream()
+                .map(notice -> new QuickQueryNoticeDTO(
+                        notice.getId(),
+                        notice.getStartTime(),
+                        notice.getEndTime(),
+                        notice.getTitle(),
+                        notice.getNoticeLike(),
+                        (long) notice.getSaveNotices().size(),
+                        notice.getCategory(),
+                        notice.getCreatedAt(),
+                        notice.getUpdatedAt()
+                ))
+                .sorted(Comparator.comparing(QuickQueryNoticeDTO::getCreatedAt)) // 오름차순 정렬
+                .collect(Collectors.toList());
     }
 
 //    @Transactional
