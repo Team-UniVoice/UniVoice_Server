@@ -278,7 +278,7 @@ public class NoticeService {
                         notice.getCreatedAt(),
                         notice.getUpdatedAt()
                 ))
-                .sorted(Comparator.comparing(QuickQueryNoticeDTO::getCreatedAt)) // 오름차순 정렬
+                .sorted(Comparator.comparing(QuickQueryNoticeDTO::getCreatedAt).reversed()) //내림차순
                 .collect(Collectors.toList());
     }
 
