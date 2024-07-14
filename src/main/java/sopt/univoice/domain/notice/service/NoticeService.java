@@ -26,6 +26,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.time.DayOfWeek;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -532,6 +535,10 @@ public class NoticeService {
         // saveCheck 로직 추가
         boolean saveCheck = saveNoticeRepository.existsByMemberIdAndNoticeId(memberId, noticeId);
 
+        // 요일 계산
+        DayOfWeek dayOfWeekEnum = notice.getCreatedAt().getDayOfWeek();
+        String dayOfWeek = convertDayOfWeekToKorean(dayOfWeekEnum);
+
         return new NoticeDetailResponseDTO(
                 notice.getId(),
                 notice.getTitle(),
@@ -549,9 +556,30 @@ public class NoticeService {
                 notice.getCreatedAt(),
                 notice.getUpdatedAt(),
                 likeCheck,
-                saveCheck // saveCheck 로직 추가
+                saveCheck, // saveCheck 로직 추가
+                dayOfWeek // dayOfWeek 추가
         );
     }
 
+    private String convertDayOfWeekToKorean(DayOfWeek dayOfWeek) {
+        switch (dayOfWeek) {
+            case MONDAY:
+                return "월";
+            case TUESDAY:
+                return "화";
+            case WEDNESDAY:
+                return "수";
+            case THURSDAY:
+                return "목";
+            case FRIDAY:
+                return "금";
+            case SATURDAY:
+                return "토";
+            case SUNDAY:
+                return "일";
+            default:
+                return "";
+        }
+    }
 
 }
