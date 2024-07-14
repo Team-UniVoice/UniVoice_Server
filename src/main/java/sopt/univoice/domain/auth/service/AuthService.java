@@ -207,10 +207,10 @@ public class AuthService {
             MemberSignInRequest memberSignInRequest
     ) {
         Member member = authRepository.findByEmail(memberSignInRequest.getEmail())
-                .orElseThrow(() -> new UnauthorizedException(ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION));
+                .orElseThrow(() -> new UnauthorizedException(ErrorMessage.JWT_LOGIN_PASSWORD_EXCEPTION));
 
         if (!passwordEncoder.matches(memberSignInRequest.getPassword(), member.getPassword())) {
-            throw new UnauthorizedException(ErrorMessage.JWT_LOGIN_EXCEPTION);
+            throw new UnauthorizedException(ErrorMessage.JWT_LOGIN_PASSWORD_EXCEPTION);
         }
 
         Long memberId = member.getId();

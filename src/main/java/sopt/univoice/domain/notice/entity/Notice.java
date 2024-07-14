@@ -21,7 +21,6 @@ public class Notice   extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     private String title;
 
     @Column(length = 1000)
@@ -39,7 +38,6 @@ public class Notice   extends BaseTimeEntity {
 
     @Column(length = 1000)
     private String contentSummary;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

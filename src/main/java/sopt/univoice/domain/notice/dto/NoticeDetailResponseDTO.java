@@ -24,4 +24,8 @@ public class NoticeDetailResponseDTO {
     private List<String> noticeImages;
     private LocalDateTime createdAt; // 추가된 부분
     private LocalDateTime updatedAt; // 추가된 부분
+    private Boolean likeCheck;
+    private Boolean saveCheck;
+    private String dayOfWeek;
+
 }
