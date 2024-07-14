@@ -8,5 +8,6 @@ import sopt.univoice.domain.user.entity.Member;
 import java.util.Optional;
 
 public interface NoticeLikeRepository extends JpaRepository<NoticeLike, Long> {
+    boolean existsByMemberIdAndNoticeId(Long memberId, Long noticeId);
     Optional<NoticeLike> findByNoticeAndMember(Notice notice, Member member);
 }

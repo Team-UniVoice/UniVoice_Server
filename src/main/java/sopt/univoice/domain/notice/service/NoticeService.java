@@ -512,6 +512,8 @@ public class NoticeService {
 
     @Transactional(readOnly = true)
     public NoticeDetailResponseDTO getNoticeById(Long noticeId) {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
 
@@ -523,6 +525,12 @@ public class NoticeService {
 
         // Affiliation의 affiliation 값을 가져옵니다.
         String writeAffiliation = affiliation.getAffiliation();
+
+        // likeCheck 로직 추가
+        boolean likeCheck = noticeLikeRepository.existsByMemberIdAndNoticeId(memberId, noticeId);
+
+        // saveCheck 로직 추가
+        boolean saveCheck = saveNoticeRepository.existsByMemberIdAndNoticeId(memberId, noticeId);
 
         return new NoticeDetailResponseDTO(
                 notice.getId(),
@@ -539,8 +547,11 @@ public class NoticeService {
                 writeAffiliation, // 추가된 부분
                 notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList()),
                 notice.getCreatedAt(),
-                notice.getUpdatedAt()
+                notice.getUpdatedAt(),
+                likeCheck,
+                saveCheck // saveCheck 로직 추가
         );
     }
+
 
 }

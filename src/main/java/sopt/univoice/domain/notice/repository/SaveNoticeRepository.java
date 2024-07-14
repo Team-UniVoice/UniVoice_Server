@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SaveNoticeRepository extends JpaRepository<SaveNotice, Long>{
+    boolean existsByMemberIdAndNoticeId(Long memberId, Long noticeId);
+
     Optional<SaveNotice> findByNoticeAndMember(Notice notice, Member member);
     List<SaveNotice> findByMember(Member member);
 }
