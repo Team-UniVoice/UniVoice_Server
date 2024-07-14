@@ -210,7 +210,7 @@ public class AuthService {
                 .orElseThrow(() -> new UnauthorizedException(ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION));
 
         if (!passwordEncoder.matches(memberSignInRequest.getPassword(), member.getPassword())) {
-            throw new UnauthorizedException(ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION);
+            throw new UnauthorizedException(ErrorMessage.JWT_LOGIN_EXCEPTION);
         }
 
         Long memberId = member.getId();
