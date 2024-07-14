@@ -33,9 +33,12 @@ public class CustomJwtAuthenticationEntryPoint implements AuthenticationEntryPoi
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        response.getWriter()
-                .write(objectMapper.writeValueAsString(
-                        ErrorResponse.of(ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION.getStatus(),
-                                ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION.getMessage())));
+        response.getWriter().write(objectMapper.writeValueAsString(
+                ErrorResponse.of(
+                        ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION.getStatus(),
+                        ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION.getMessage(),
+                        null // 추가된 필드
+                )
+        ));
     }
 }
