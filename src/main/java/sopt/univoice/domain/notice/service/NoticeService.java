@@ -19,10 +19,13 @@ import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.external.OpenAiService;
 import sopt.univoice.infra.external.S3Service;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -345,6 +348,103 @@ public class NoticeService {
 //    }
 
 
+//    @Transactional
+//    public QuickScanDTO quickhead() {
+//        Long memberId = principalHandler.getUserIdFromPrincipal();
+//        Member member = authRepository.findById(memberId)
+//                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+//
+//        String universityName = member.getUniversityName();
+//        String collegeDepartmentName = member.getCollegeDepartmentName();
+//        String departmentName = member.getDepartmentName();
+//
+//        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
+//        List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "단과대학학생회");
+//        List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "과학생회");
+//
+//        String universityLogoImage = null;
+//        String collegeDepartmentLogoImage = null;
+//        String departmentLogoImage = null;
+//
+//        // '총학생회'에 대한 로고 이미지 가져오기
+//        Affiliation universityAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("총학생회", universityName);
+//        if (universityAffiliation != null) {
+//            universityLogoImage = universityAffiliation.getAffiliationLogoImage();
+//        }
+//
+//        // '단과대학학생회'에 대한 로고 이미지 가져오기
+//        Affiliation collegeAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("단과대학학생회", universityName);
+//        if (collegeAffiliation != null) {
+//            collegeDepartmentLogoImage = collegeAffiliation.getAffiliationLogoImage();
+//        }
+//
+//        // '과학생회'에 대한 로고 이미지 가져오기
+//        Affiliation departmentAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("과학생회", universityName);
+//        if (departmentAffiliation != null) {
+//            departmentLogoImage = departmentAffiliation.getAffiliationLogoImage();
+//        }
+//
+//        List<Notice> filteredUniversityNotices = new ArrayList<>();
+//        for (Notice notice : universityNotices) {
+//            for (NoticeView noticeView : notice.getNoticeViews()) {
+//                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+//                    filteredUniversityNotices.add(notice);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        List<Notice> filteredCollegeNotices = new ArrayList<>();
+//        for (Notice notice : collegeNotices) {
+//            for (NoticeView noticeView : notice.getNoticeViews()) {
+//                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+//                    filteredCollegeNotices.add(notice);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        List<Notice> filteredDepartmentNotices = new ArrayList<>();
+//        for (Notice notice : departmentNotices) {
+//            for (NoticeView noticeView : notice.getNoticeViews()) {
+//                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+//                    filteredDepartmentNotices.add(notice);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        // 공지사항 필터링
+//        int universityNameCount = filteredUniversityNotices.size();
+//        int collegeDepartmentCount = filteredCollegeNotices.size();
+//        int departmentCount = filteredDepartmentNotices.size();
+//
+//        QuickScanDTO quickScans = new QuickScanDTO(
+//                universityName + " 총학생회", universityNameCount, universityLogoImage,
+//                collegeDepartmentName + " 학생회", collegeDepartmentCount, collegeDepartmentLogoImage,
+//                departmentName + " 학생회", departmentCount, departmentLogoImage
+//        );
+//
+//        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
+//
+//        List<NoticeDTO> noticeDTOs = new ArrayList<>();
+//        for (Notice notice : notices) {
+//            NoticeDTO noticeDTO = new NoticeDTO(
+//                    notice.getId(),
+//                    notice.getStartTime(),
+//                    notice.getEndTime(),
+//                    notice.getTitle(),
+//                    notice.getNoticeLike(),
+//                    (long) notice.getSaveNotices().size(),
+//                    notice.getCategory().toString() // assuming category is an enum or string
+//            );
+//            noticeDTOs.add(noticeDTO);
+//        }
+//
+//        return quickScans;
+//    }
+//
+
     @Transactional
     public QuickScanDTO quickhead() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
@@ -381,32 +481,40 @@ public class NoticeService {
             departmentLogoImage = departmentAffiliation.getAffiliationLogoImage();
         }
 
+        LocalDateTime now = LocalDateTime.now();
+
         List<Notice> filteredUniversityNotices = new ArrayList<>();
         for (Notice notice : universityNotices) {
-            for (NoticeView noticeView : notice.getNoticeViews()) {
-                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredUniversityNotices.add(notice);
-                    break;
+            if (notice.getCreatedAt().isAfter(now.minus(7, ChronoUnit.DAYS))) {
+                for (NoticeView noticeView : notice.getNoticeViews()) {
+                    if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+                        filteredUniversityNotices.add(notice);
+                        break;
+                    }
                 }
             }
         }
 
         List<Notice> filteredCollegeNotices = new ArrayList<>();
         for (Notice notice : collegeNotices) {
-            for (NoticeView noticeView : notice.getNoticeViews()) {
-                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredCollegeNotices.add(notice);
-                    break;
+            if (notice.getCreatedAt().isAfter(now.minus(7, ChronoUnit.DAYS))) {
+                for (NoticeView noticeView : notice.getNoticeViews()) {
+                    if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+                        filteredCollegeNotices.add(notice);
+                        break;
+                    }
                 }
             }
         }
 
         List<Notice> filteredDepartmentNotices = new ArrayList<>();
         for (Notice notice : departmentNotices) {
-            for (NoticeView noticeView : notice.getNoticeViews()) {
-                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredDepartmentNotices.add(notice);
-                    break;
+            if (notice.getCreatedAt().isAfter(now.minus(7, ChronoUnit.DAYS))) {
+                for (NoticeView noticeView : notice.getNoticeViews()) {
+                    if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+                        filteredDepartmentNotices.add(notice);
+                        break;
+                    }
                 }
             }
         }
