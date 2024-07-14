@@ -270,7 +270,9 @@ public class NoticeService {
                 notice.getTitle(),
                 notice.getNoticeLike(),
                 (long) notice.getSaveNotices().size(),
-                notice.getCategory()
+                notice.getCategory(),
+                notice.getCreatedAt(),
+                notice.getUpdatedAt()
         )).collect(Collectors.toList());
     }
 
