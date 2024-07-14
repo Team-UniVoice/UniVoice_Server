@@ -20,15 +20,15 @@ public enum SuccessMessage {
     LIKE_CANCLE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 좋아요 취소에 성공하였습니다."),
     SAVE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 저장에 성공하였습니다."),
     SAVE_CANCLE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 저장 취소에 성공하였습니다."),
-    SAVE_ALL_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 저장 리스트 조회에 성공하였습니다."),
+    SAVE_ALL_NOTICE_SUCCESS(HttpStatus.OK.value(),"공지 저장 리스트 조회에 성공하였습니다."),
     VIEW_COUNT_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 조회 체크 후 조회수 증가 성공하였습니다."),
     VIEW_CHECK_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 조회 체크에 성공하였습니다."),
-    GET_QUCIK_HEAD_SUCCESS(HttpStatus.CREATED.value(),"퀵스캔 스토리 헤드 데이터 조회에 성공하였습니다."),
-    GET_ALL_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"전체 공지 조회에 성공하였습니다."),
-    GET_ALL_UNIVERSITY_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"총학생회 공지 조회에 성공하였습니다."),
-    GET_ALL_COLLEGE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"단과대학 학생회 공지 조회에 성공하였습니다."),
-    GET_ALL_DEPARTMENT_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"학과 학생회 공지 조회에 성공하였습니다."),
-    GET_QUICK_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"퀵스캔 공지 조회에 성공하였습니다."),
+    GET_QUCIK_HEAD_SUCCESS(HttpStatus.OK.value(),"퀵스캔 스토리 헤드 데이터 조회에 성공하였습니다."),
+    GET_ALL_NOTICE_SUCCESS(HttpStatus.OK.value(),"전체 공지 조회에 성공하였습니다."),
+    GET_ALL_UNIVERSITY_NOTICE_SUCCESS(HttpStatus.OK.value(),"총학생회 공지 조회에 성공하였습니다."),
+    GET_ALL_COLLEGE_NOTICE_SUCCESS(HttpStatus.OK.value(),"단과대학 학생회 공지 조회에 성공하였습니다."),
+    GET_ALL_DEPARTMENT_NOTICE_SUCCESS(HttpStatus.OK.value(),"학과 학생회 공지 조회에 성공하였습니다."),
+    GET_QUICK_NOTICE_SUCCESS(HttpStatus.OK.value(),"퀵스캔 공지 조회에 성공하였습니다."),
     GET_Detail_NOTICE_SUCCESS(HttpStatus.OK.value(),"개별 공지 조회에 성공하였습니다.")
     ;
     private final int status;
