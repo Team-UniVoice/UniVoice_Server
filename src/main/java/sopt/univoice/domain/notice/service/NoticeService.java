@@ -627,17 +627,21 @@ public class NoticeService {
 
         List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "단과대학학생회");
 
-        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> new NoticeResponseDTO(
-                notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
-                notice.getTitle(),
-                notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory(),
-                notice.getCreatedAt(),
-                notice.getUpdatedAt()
-        )).collect(Collectors.toList());
+        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream()
+                .map(notice -> new NoticeResponseDTO(
+                        notice.getId(),
+                        notice.getStartTime(),
+                        notice.getEndTime(),
+                        notice.getTitle(),
+                        notice.getNoticeLike(),
+                        (long) notice.getSaveNotices().size(),
+                        notice.getCategory(),
+                        notice.getCreatedAt(),
+                        notice.getUpdatedAt()
+                ))
+                .sorted(Comparator.comparing(NoticeResponseDTO::getCreatedAt)) // 오름차순 정렬
+                .collect(Collectors.toList());
+
 
 
 
