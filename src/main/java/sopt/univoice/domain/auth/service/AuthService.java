@@ -219,13 +219,7 @@ public class AuthService {
                 UserAuthentication.createUserAuthentication(memberId, authorities)
         );
 
-        return UserLoginResponse.of(accessToken, memberId.toString());
+        return UserLoginResponse.of(accessToken);
     }
-
-
-
-
-
-
 
 }

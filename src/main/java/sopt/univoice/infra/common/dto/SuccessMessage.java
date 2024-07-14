@@ -13,6 +13,8 @@ public enum SuccessMessage {
     EMAIL_DUPLICATE(HttpStatus.OK.value(),"이미 해당 아이디를 사용자가 사용중입니다. "),
     EMAIL_AVAILABLE(HttpStatus.OK.value(),"사용가능한 아이디입니다."),
     SIGNUP_SUCCESS(HttpStatus.CREATED.value(),"회원가입에 성공하였습니다."),
+    SIGNIN_SUCCESS(HttpStatus.OK.value(),"로그인에 성공하였습니다."),
+
     CREATE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지작성에 성공하였습니다."),
     LIKE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 좋아요에 성공하였습니다."),
     LIKE_CANCLE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 좋아요 취소에 성공하였습니다."),
