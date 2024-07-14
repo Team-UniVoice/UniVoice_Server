@@ -10,9 +10,15 @@ import lombok.NoArgsConstructor;
 public class QuickScanDTO {
     private String universityName;
     private int universityNameCount;
+    private String universityLogoImage;
+
+
     private String collegeDepartmentName;
     private int collegeDepartmentCount;
+    private String collegeDepartmentLogoImage;
+
     private String departmentName;
     private int departmentCount;
+    private String departmentLogoImage;
 }
 

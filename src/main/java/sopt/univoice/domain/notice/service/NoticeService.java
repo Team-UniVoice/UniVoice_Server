@@ -1,10 +1,12 @@
 package sopt.univoice.domain.notice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import sopt.univoice.domain.affiliation.entity.Affiliation;
+import sopt.univoice.domain.affiliation.repository.AffiliationRepository;
 import sopt.univoice.domain.auth.PrincipalHandler;
 import sopt.univoice.domain.auth.repository.AuthRepository;
 import sopt.univoice.domain.notice.dto.*;
@@ -35,6 +37,8 @@ public class NoticeService {
     private final NoticeLikeRepository noticeLikeRepository;
     private final SaveNoticeRepository saveNoticeRepository;
     private final NoticeViewRepository noticeViewRepository;
+    @Autowired
+    private AffiliationRepository affiliationRepository;
 
     @Transactional
     public void createPost(NoticeCreateRequest noticeCreateRequest) {
@@ -264,6 +268,83 @@ public class NoticeService {
         )).collect(Collectors.toList());
     }
 
+//    @Transactional
+//    public QuickScanDTO quickhead() {
+//        Long memberId = principalHandler.getUserIdFromPrincipal();
+//        Member member = authRepository.findById(memberId)
+//                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+//
+//        String universityName = member.getUniversityName();
+//        String collegeDepartmentName = member.getCollegeDepartmentName();
+//        String departmentName = member.getDepartmentName();
+//
+//        List<Notice> UniversityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
+//        List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "단과대학학생회");
+//        List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "과학생회");
+//
+//        List<Notice> filteredUniversityNotices = new ArrayList<>();
+//        for (Notice notice : UniversityNotices) {
+//            for (NoticeView noticeView : notice.getNoticeViews()) {
+//                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+//                    filteredUniversityNotices.add(notice);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        List<Notice> filteredCollegeNotices = new ArrayList<>();
+//        for (Notice notice : collegeNotices) {
+//            for (NoticeView noticeView : notice.getNoticeViews()) {
+//                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+//                    filteredCollegeNotices.add(notice);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        List<Notice> filteredDepartmentNotices = new ArrayList<>();
+//        for (Notice notice : departmentNotices) {
+//            for (NoticeView noticeView : notice.getNoticeViews()) {
+//                if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
+//                    filteredDepartmentNotices.add(notice);
+//                    break;
+//                }
+//            }
+//        }
+//
+//        // 공지사항 필터링
+//
+//        int universityNameCount = filteredUniversityNotices.size();
+//        int collegeDepartmentCount = filteredCollegeNotices.size();
+//        int departmentCount = filteredDepartmentNotices.size();
+//
+//        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
+//
+//
+//        QuickScanDTO quickScans = new QuickScanDTO(
+//                universityName + " 총학생회", universityNameCount,
+//                collegeDepartmentName + " 학생회", collegeDepartmentCount,
+//                departmentName + " 학생회", departmentCount
+//        );
+//
+//        List<NoticeDTO> noticeDTOs = new ArrayList<>();
+//        for (Notice notice : notices) {
+//            NoticeDTO noticeDTO = new NoticeDTO(
+//                    notice.getId(),
+//                    notice.getStartTime(),
+//                    notice.getEndTime(),
+//                    notice.getTitle(),
+//                    notice.getNoticeLike(),
+//                    (long) notice.getSaveNotices().size(),
+//                    notice.getCategory().toString() // assuming category is an enum or string
+//            );
+//            noticeDTOs.add(noticeDTO);
+//        }
+//
+//        return  quickScans;
+//    }
+
+
     @Transactional
     public QuickScanDTO quickhead() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
@@ -274,12 +355,34 @@ public class NoticeService {
         String collegeDepartmentName = member.getCollegeDepartmentName();
         String departmentName = member.getDepartmentName();
 
-        List<Notice> UniversityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
         List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "단과대학학생회");
         List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "과학생회");
 
+        String universityLogoImage = null;
+        String collegeDepartmentLogoImage = null;
+        String departmentLogoImage = null;
+
+        // '총학생회'에 대한 로고 이미지 가져오기
+        Affiliation universityAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("총학생회", universityName);
+        if (universityAffiliation != null) {
+            universityLogoImage = universityAffiliation.getAffiliationLogoImage();
+        }
+
+        // '단과대학학생회'에 대한 로고 이미지 가져오기
+        Affiliation collegeAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("단과대학학생회", universityName);
+        if (collegeAffiliation != null) {
+            collegeDepartmentLogoImage = collegeAffiliation.getAffiliationLogoImage();
+        }
+
+        // '과학생회'에 대한 로고 이미지 가져오기
+        Affiliation departmentAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("과학생회", universityName);
+        if (departmentAffiliation != null) {
+            departmentLogoImage = departmentAffiliation.getAffiliationLogoImage();
+        }
+
         List<Notice> filteredUniversityNotices = new ArrayList<>();
-        for (Notice notice : UniversityNotices) {
+        for (Notice notice : universityNotices) {
             for (NoticeView noticeView : notice.getNoticeViews()) {
                 if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
                     filteredUniversityNotices.add(notice);
@@ -309,19 +412,17 @@ public class NoticeService {
         }
 
         // 공지사항 필터링
-
         int universityNameCount = filteredUniversityNotices.size();
         int collegeDepartmentCount = filteredCollegeNotices.size();
         int departmentCount = filteredDepartmentNotices.size();
 
-        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
-
-
         QuickScanDTO quickScans = new QuickScanDTO(
-                universityName + " 총학생회", universityNameCount,
-                collegeDepartmentName + " 학생회", collegeDepartmentCount,
-                departmentName + " 학생회", departmentCount
+                universityName + " 총학생회", universityNameCount, universityLogoImage,
+                collegeDepartmentName + " 학생회", collegeDepartmentCount, collegeDepartmentLogoImage,
+                departmentName + " 학생회", departmentCount, departmentLogoImage
         );
+
+        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
 
         List<NoticeDTO> noticeDTOs = new ArrayList<>();
         for (Notice notice : notices) {
@@ -337,8 +438,9 @@ public class NoticeService {
             noticeDTOs.add(noticeDTO);
         }
 
-        return  quickScans;
+        return quickScans;
     }
+
 
     @Transactional
     public List<NoticeDTO>  getAllNoticeByUserUniversity() {
