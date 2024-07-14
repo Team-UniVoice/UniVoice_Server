@@ -31,6 +31,7 @@ public class Affiliation extends BaseTimeEntity {
 
     private String affiliationLogoImage;
 
+    private String  affiliationUniversityName;
 
     @OneToMany(mappedBy = "affiliation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members;

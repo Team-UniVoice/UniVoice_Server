@@ -22,6 +22,7 @@ public enum SuccessMessage {
     SAVE_CANCLE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 저장 취소에 성공하였습니다."),
     SAVE_ALL_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 저장 리스트 조회에 성공하였습니다."),
     VIEW_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"공지 조회 체크에 성공하였습니다."),
+    GET_QUCIK_HEAD_SUCCESS(HttpStatus.CREATED.value(),"퀵스캔 스토리 헤드 데이터 조회에 성공하였습니다."),
     GET_ALL_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"전체 공지 조회에 성공하였습니다."),
     GET_ALL_UNIVERSITY_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"총학생회 공지 조회에 성공하였습니다."),
     GET_ALL_COLLEGE_NOTICE_SUCCESS(HttpStatus.CREATED.value(),"단과대학 학생회 공지 조회에 성공하였습니다."),
