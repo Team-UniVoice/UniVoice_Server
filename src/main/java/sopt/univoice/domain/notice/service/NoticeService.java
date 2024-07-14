@@ -81,7 +81,7 @@ public class NoticeService {
         System.out.println("Notice saved successfully with ID: " + notice.getId());
 
         // NoticeImage 엔티티 생성 및 저장
-        for (MultipartFile file : noticeCreateRequest.getStudentCardImages()) {
+        for (MultipartFile file : noticeCreateRequest.getNoticeImages()) {
             String fileName = storeFile(file); // 파일 저장 로직 필요
             NoticeImage noticeImage = NoticeImage.builder()
                     .notice(notice)
