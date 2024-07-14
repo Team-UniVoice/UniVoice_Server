@@ -538,7 +538,9 @@ public class NoticeService {
                 notice.getContentSummary(),
                 notice.getMember().getId(),
                 writeAffiliation, // 추가된 부분
-                notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList())
+                notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList()),
+                notice.getCreatedAt(),
+                notice.getUpdatedAt()
         );
     }
 
