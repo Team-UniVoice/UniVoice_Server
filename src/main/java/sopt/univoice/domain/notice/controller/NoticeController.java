@@ -72,7 +72,15 @@ public class NoticeController {
 
         noticeService.viewCount(noticeId);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(SuccessStatusResponse.of(SuccessMessage.VIEW_NOTICE_SUCCESS, null));
+                .body(SuccessStatusResponse.of(SuccessMessage.VIEW_COUNT_NOTICE_SUCCESS, null));
+    }
+
+    @PostMapping("/view-check/{noticeId}")
+    public ResponseEntity<SuccessStatusResponse<Object>> viewCheck(@PathVariable Long noticeId) {
+
+        noticeService.viewCheck(noticeId);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(SuccessStatusResponse.of(SuccessMessage.VIEW_CHECK_NOTICE_SUCCESS, null));
     }
 
     @GetMapping("/quickhead")

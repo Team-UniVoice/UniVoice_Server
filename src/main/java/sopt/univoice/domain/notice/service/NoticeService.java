@@ -252,6 +252,29 @@ public class NoticeService {
 
 
     @Transactional
+    public void viewCheck(Long noticeId) {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
+        // member와 notice를 가져옵니다.
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
+
+        // viewCount를 1 증가시킵니다.
+
+        noticeRepository.save(notice);
+
+        // NoticeView에서 해당 member와 notice의 데이터를 찾아 readAt을 true로 설정합니다.
+        NoticeView noticeView = noticeViewRepository.findByNoticeAndMember(notice, member)
+                .orElseThrow(() -> new RuntimeException("조회 기록이 존재하지 않습니다."));
+        noticeView.setReadAt(true);
+        noticeViewRepository.save(noticeView);
+    }
+
+
+
+    @Transactional
     public List<QuickQueryNoticeDTO> getQuickNoticeByUserUniversity(String affiliation) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
