@@ -358,14 +358,15 @@ public class NoticeService {
 
         List<NoticeDTO> noticeDTOs = new ArrayList<>();
         for (Notice notice : notices) {
+            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
             NoticeDTO noticeDTO = new NoticeDTO(
-                    notice.getId(),
-                    notice.getStartTime(),
-                    notice.getEndTime(),
-                    notice.getTitle(),
-                    notice.getNoticeLike(),
-                    (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                notice.getId(),
+                notice.getCreatedAt(),
+                notice.getTitle(),
+                notice.getNoticeLike(),
+                notice.getViewCount(),
+                notice.getCategory(),
+                image
             );
             noticeDTOs.add(noticeDTO);
         }
@@ -382,16 +383,20 @@ public class NoticeService {
         String universityName = member.getUniversityName();
         List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
 
+        // 최신순 정렬
+        notices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
+
         List<NoticeDTO> noticeDTOs = new ArrayList<>();
         for (Notice notice : notices) {
+            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
             NoticeDTO noticeDTO = new NoticeDTO(
                     notice.getId(),
-                    notice.getStartTime(),
-                    notice.getEndTime(),
+                    notice.getCreatedAt(),
                     notice.getTitle(),
                     notice.getNoticeLike(),
-                    (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                    notice.getViewCount(),
+                    notice.getCategory(),
+                    image
             );
             noticeDTOs.add(noticeDTO);
         }
@@ -411,14 +416,15 @@ public class NoticeService {
 
         List<NoticeDTO> noticeResponseDTOs = new ArrayList<>();
         for (Notice notice : universityNotices) {
+            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
             NoticeDTO noticeDTO = new NoticeDTO(
-                    notice.getId(),
-                    notice.getStartTime(),
-                    notice.getEndTime(),
-                    notice.getTitle(),
-                    notice.getNoticeLike(),
-                    (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                notice.getId(),
+                notice.getCreatedAt(),
+                notice.getTitle(),
+                notice.getNoticeLike(),
+                notice.getViewCount(),
+                notice.getCategory(),
+                image // assuming category is an enum or string
             );
             noticeResponseDTOs.add(noticeDTO);
         }
