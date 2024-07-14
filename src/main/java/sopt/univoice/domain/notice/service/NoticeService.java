@@ -610,7 +610,7 @@ public class NoticeService {
             );
             noticeResponseDTOs.add(noticeDTO);
         }
-
+        noticeResponseDTOs.sort(Comparator.comparing(NoticeDTO::getCreatedAt));
 
 
         return  noticeResponseDTOs;
