@@ -411,7 +411,6 @@ public class NoticeService {
             noticeDTOs.add(noticeDTO);
         }
 
-        // Sort the list based on createdAt in descending order
         noticeDTOs.sort(Comparator.comparing(NoticeDTO::getCreatedAt));
 
         return noticeDTOs;

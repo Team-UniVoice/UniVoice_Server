@@ -37,6 +37,10 @@ public class Notice   extends BaseTimeEntity {
 
     private String category;
 
+    private Boolean likeCheck = false; // 초기값 설정
+
+    private Boolean saveCheck = false; // 초기값 설정
+
     @Column(length = 1000)
     private String contentSummary;
 
