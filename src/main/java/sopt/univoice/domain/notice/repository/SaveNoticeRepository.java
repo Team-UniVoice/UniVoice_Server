@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface SaveNoticeRepository extends JpaRepository<SaveNotice, Long>{
     Optional<SaveNotice> findByNoticeAndMember(Notice notice, Member member);
     List<SaveNotice> findByMember(Member member);
+
+    boolean existsByNoticeAndMember(Notice notice, Member member);
 }
 
 

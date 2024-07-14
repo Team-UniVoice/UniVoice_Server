@@ -13,12 +13,14 @@ import sopt.univoice.domain.notice.repository.*;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.domain.affiliation.entity.Role;
 import sopt.univoice.infra.common.exception.UnauthorizedException;
+import sopt.univoice.infra.common.exception.message.BusinessException;
 import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.external.OpenAiService;
 import sopt.univoice.infra.external.S3Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,16 +34,16 @@ public class NoticeService {
     private final PrincipalHandler principalHandler;
     private final S3Service s3Service;
     private final OpenAiService openAiService;
+    private final NoticeViewRepository noticeViewRepository;
     private final NoticeLikeRepository noticeLikeRepository;
     private final SaveNoticeRepository saveNoticeRepository;
-    private final NoticeViewRepository noticeViewRepository;
 
     @Transactional
     public void createPost(NoticeCreateRequest noticeCreateRequest) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
         System.out.println("Authenticated Member ID: " + memberId);
         Member member = authRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+                            .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         System.out.println("Member Role: " + member.getAffiliation().getRole());
 
         String summarizedContent = null;
@@ -61,27 +63,36 @@ public class NoticeService {
 
         // Notice 엔티티 생성 및 저장
         Notice notice = Notice.builder()
-                .title(noticeCreateRequest.getTitle())
-                .content(noticeCreateRequest.getContent())
-                .target(noticeCreateRequest.getTarget())
-                .startTime(noticeCreateRequest.getStartTime())
-                .endTime(noticeCreateRequest.getEndTime())
-                .member(member)
-                .contentSummary(summarizedContent)
-                .category("공지사항")  // category 값을 '공지사항'으로 설정
-                .build();
+                            .title(noticeCreateRequest.getTitle())
+                            .content(noticeCreateRequest.getContent())
+                            .target(noticeCreateRequest.getTarget() != null ? noticeCreateRequest.getTarget() : "")
+                            .startTime(noticeCreateRequest.getStartTime() != null ? noticeCreateRequest.getStartTime() : null)
+                            .endTime(noticeCreateRequest.getEndTime() != null ? noticeCreateRequest.getEndTime() : null)
+                            .member(member)
+                            .contentSummary(summarizedContent)
+                            .category("공지사항")  // category 값을 '공지사항'으로 설정
+                            .build();
         noticeRepository.save(notice);
         System.out.println("Notice saved successfully with ID: " + notice.getId());
 
         // NoticeImage 엔티티 생성 및 저장
-        for (MultipartFile file : noticeCreateRequest.getStudentCardImages()) {
-            String fileName = storeFile(file); // 파일 저장 로직 필요
-            NoticeImage noticeImage = NoticeImage.builder()
-                    .notice(notice)
-                    .noticeImage(fileName)
-                    .build();
-            noticeImageRepository.save(noticeImage);
-            System.out.println("NoticeImage saved successfully with file name: " + fileName);
+        List<MultipartFile> files = noticeCreateRequest.getImageList();
+
+        if (files != null && !files.isEmpty()) {
+            for (MultipartFile file : files) {
+                try {
+                    String fileUrl = storeFile(file); // 파일 저장 로직 필요
+                    NoticeImage noticeImage = NoticeImage.builder()
+                                                  .notice(notice)
+                                                  .noticeImage(fileUrl)
+                                                  .build();
+                    noticeImageRepository.save(noticeImage);
+                    System.out.println("NoticeImage saved successfully with file URL: " + fileUrl);
+                } catch (Exception e) {
+                    System.err.println("Error saving NoticeImage: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
         }
 
         // NoticeView 엔티티 생성 및 저장
@@ -90,23 +101,23 @@ public class NoticeService {
 
         for (Member universityMember : universityMembers) {
             NoticeView noticeView = NoticeView.builder()
-                    .notice(notice)
-                    .member(universityMember)
-                    .readAt(false)
-                    .build();
+                                        .notice(notice)
+                                        .member(universityMember)
+                                        .readAt(false)
+                                        .build();
             noticeViewRepository.save(noticeView);
         }
-
     }
 
     private String storeFile(MultipartFile file) {
         try {
-            return s3Service.uploadImage("notice-images/", file);
+            String fileUrl = s3Service.uploadImage("notice-images/", file);
+            return fileUrl;
         } catch (IOException e) {
+            System.err.println("File upload failed: " + e.getMessage());
             throw new RuntimeException("파일 업로드에 실패했습니다.", e);
         }
     }
-
 
     @Transactional
     public void likeNotice(Long noticeId) {
@@ -117,6 +128,12 @@ public class NoticeService {
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
+
+        // 이미 좋아요를 누른 것인지 확인
+        boolean alreadyLiked = noticeLikeRepository.existsByNoticeAndMember(notice, member);
+        if (alreadyLiked) {
+            throw new BusinessException(ErrorMessage.ALREADY_LIKED);
+        }
 
         // noticeLike를 1 증가시킵니다.
         notice.setNoticeLike(notice.getNoticeLike() + 1);
@@ -161,6 +178,16 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
 
+        // 이미 저장한 공지인지 확인하는 부분 추가
+        boolean alreadySaved = saveNoticeRepository.existsByNoticeAndMember(notice, member);
+        if (alreadySaved) {
+            throw new BusinessException(ErrorMessage.ALREADY_SAVED);
+        }
+
+        // noticeSave를 1 증가시킵니다.
+        notice.setNoticeSave(notice.getNoticeSave() + 1);
+        noticeRepository.save(notice);
+
         // SaveNotice 엔티티 생성 및 저장
         SaveNotice saveNotice = SaveNotice.builder()
                 .notice(notice)
@@ -179,9 +206,13 @@ public class NoticeService {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
 
+        // noticeSave를 1 감소시킵니다.
+        notice.setNoticeSave(notice.getNoticeSave() - 1);
+        noticeRepository.save(notice);
+
         // SaveNotice 엔티티 삭제
         SaveNotice saveNotice = saveNoticeRepository.findByNoticeAndMember(notice, member)
-                .orElseThrow(() -> new RuntimeException("저장된 공지사항이 존재하지 않습니다."));
+                                    .orElseThrow(() -> new RuntimeException("저장된 공지사항이 존재하지 않습니다."));
         saveNoticeRepository.delete(saveNotice);
     }
 
@@ -195,19 +226,21 @@ public class NoticeService {
         List<SaveNotice> saveNotices = saveNoticeRepository.findByMember(member);
 
         return saveNotices.stream()
-                .map(saveNotice -> {
-                    Notice notice = saveNotice.getNotice();
-                    return new NoticeSaveDTO(
-                            notice.getId(),
-                            notice.getTitle(),
-                            notice.getViewCount(),
-                            notice.getNoticeLike(),
-                            notice.getCategory(),
-                            notice.getStartTime(),
-                            notice.getEndTime()
-                    );
-                })
-                .collect(Collectors.toList());
+                   .map(saveNotice -> {
+                       Notice notice = saveNotice.getNotice();
+                       String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
+                       return new NoticeSaveDTO(
+                           notice.getId(),
+                           notice.getTitle(),
+                           notice.getViewCount(),
+                           notice.getNoticeLike(),
+                           notice.getCategory(),
+                           notice.getCreatedAt(),
+                           image
+                       );
+                   })
+                   .sorted(Comparator.comparing(NoticeSaveDTO::getCreatedAt))
+                   .collect(Collectors.toList());
     }
 
     @Transactional
@@ -234,34 +267,54 @@ public class NoticeService {
 
 
     @Transactional
-    public List<QuickQueryNoticeDTO> getQuickNoticeByUserUniversity(String affiliation) {
+    public List<QuickQueryNoticeDTO> getQuickNoticeDetail(String affiliation) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
         Member member = authRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         String universityName = member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
+        String departmentName = member.getDepartmentName();
 
-        List<Notice> notices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, affiliation);
-
-        System.out.println("Notices: " + notices);
+        List<Notice> notices;
+        if ("총 학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총 학생회");
+        } else if ("단과대학 학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학 학생회");
+        } else if ("학과 학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, departmentName, "학과 학생회");
+        } else {
+            throw new IllegalArgumentException("Invalid affiliation");
+        }
 
         List<Notice> filteredNotices = notices.stream()
-                .filter(notice -> notice.getNoticeViews().stream()
-                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
-                .collect(Collectors.toList());
+                                           .filter(notice -> notice.getNoticeViews().stream()
+                                                                 .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
+                                           .collect(Collectors.toList());
 
-        System.out.println("Filtered Notices Count: " + filteredNotices.size());
+        return filteredNotices.stream().map(notice -> {
+            String writeAffiliation = "";
+            if ("총 학생회".equals(affiliation)) {
+                writeAffiliation = "총학생회 " + notice.getMember().getAffiliation().getAffiliationName();
+            } else if ("단과대학 학생회".equals(affiliation)) {
+                writeAffiliation = member.getCollegeDepartmentName() + " 학생회 " + notice.getMember().getAffiliation().getAffiliationName();
+            } else if ("학과 학생회".equals(affiliation)) {
+                writeAffiliation = member.getDepartmentName() + " 학생회 " + notice.getMember().getAffiliation().getAffiliationName();
+            }
 
-        return filteredNotices.stream().map(notice -> new QuickQueryNoticeDTO(
+            return new QuickQueryNoticeDTO(
                 notice.getId(),
+                writeAffiliation,
+                notice.getCreatedAt(),
+                notice.getViewCount(),
+                notice.getTitle(),
+                notice.getTarget(),
                 notice.getStartTime(),
                 notice.getEndTime(),
-                notice.getTitle(),
-                notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
+                notice.getContentSummary()
+            );
+        }).collect(Collectors.toList());
     }
 
     @Transactional
@@ -274,70 +327,53 @@ public class NoticeService {
         String collegeDepartmentName = member.getCollegeDepartmentName();
         String departmentName = member.getDepartmentName();
 
-        List<Notice> UniversityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
-        List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "단과대학학생회");
-        List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "과학생회");
+        // 총학생회 공지
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총 학생회");
+        // 단과대학 공지
+        List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학 학생회");
+        // 학과 공지
+        List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, departmentName, "학과 학생회");
 
-        List<Notice> filteredUniversityNotices = new ArrayList<>();
-        for (Notice notice : UniversityNotices) {
+        // 읽지 않은 총학생회 공지 필터링 및 카운트
+        int universityNameCount = 0;
+        for (Notice notice : universityNotices) {
             for (NoticeView noticeView : notice.getNoticeViews()) {
                 if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredUniversityNotices.add(notice);
+                    universityNameCount++;
                     break;
                 }
             }
         }
 
-        List<Notice> filteredCollegeNotices = new ArrayList<>();
+        // 읽지 않은 단과대학 공지 필터링 및 카운트
+        int collegeDepartmentCount = 0;
         for (Notice notice : collegeNotices) {
             for (NoticeView noticeView : notice.getNoticeViews()) {
                 if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredCollegeNotices.add(notice);
+                    collegeDepartmentCount++;
                     break;
                 }
             }
         }
 
-        List<Notice> filteredDepartmentNotices = new ArrayList<>();
+        // 읽지 않은 학과 공지 필터링 및 카운트
+        int departmentCount = 0;
         for (Notice notice : departmentNotices) {
             for (NoticeView noticeView : notice.getNoticeViews()) {
                 if (noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()) {
-                    filteredDepartmentNotices.add(notice);
+                    departmentCount++;
                     break;
                 }
             }
         }
 
-        // 공지사항 필터링
-
-        int universityNameCount = filteredUniversityNotices.size();
-        int collegeDepartmentCount = filteredCollegeNotices.size();
-        int departmentCount = filteredDepartmentNotices.size();
-
-        List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
-
-
         QuickScanDTO quickScans = new QuickScanDTO(
-                universityName + " 총학생회", universityNameCount,
-                collegeDepartmentName + " 학생회", collegeDepartmentCount,
-                departmentName + " 학생회", departmentCount
+            universityName + " 총학생회", universityNameCount,
+            collegeDepartmentName + " 학생회", collegeDepartmentCount,
+            departmentName + " 학생회", departmentCount
         );
 
-        List<NoticeDTO> noticeDTOs = new ArrayList<>();
-        for (Notice notice : notices) {
-            NoticeDTO noticeDTO = new NoticeDTO(
-                    notice.getId(),
-                    notice.getStartTime(),
-                    notice.getEndTime(),
-                    notice.getTitle(),
-                    notice.getNoticeLike(),
-                    (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
-            );
-            noticeDTOs.add(noticeDTO);
-        }
-
-        return  quickScans;
+        return quickScans;
     }
 
     @Transactional
@@ -349,16 +385,20 @@ public class NoticeService {
         String universityName = member.getUniversityName();
         List<Notice> notices = noticeRepository.findAllByMemberUniversityName(universityName);
 
+        // 최신순 정렬
+        notices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
+
         List<NoticeDTO> noticeDTOs = new ArrayList<>();
         for (Notice notice : notices) {
+            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
             NoticeDTO noticeDTO = new NoticeDTO(
                     notice.getId(),
-                    notice.getStartTime(),
-                    notice.getEndTime(),
+                    notice.getCreatedAt(),
                     notice.getTitle(),
                     notice.getNoticeLike(),
-                    (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                    notice.getViewCount(),
+                    notice.getCategory(),
+                    image
             );
             noticeDTOs.add(noticeDTO);
         }
@@ -374,18 +414,21 @@ public class NoticeService {
 
         String universityName = member.getUniversityName();
 
-        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총학생회");
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총 학생회");
+        // 최신순 정렬
+        universityNotices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
 
         List<NoticeDTO> noticeResponseDTOs = new ArrayList<>();
         for (Notice notice : universityNotices) {
+            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
             NoticeDTO noticeDTO = new NoticeDTO(
-                    notice.getId(),
-                    notice.getStartTime(),
-                    notice.getEndTime(),
-                    notice.getTitle(),
-                    notice.getNoticeLike(),
-                    (long) notice.getSaveNotices().size(),
-                    notice.getCategory().toString() // assuming category is an enum or string
+                notice.getId(),
+                notice.getCreatedAt(),
+                notice.getTitle(),
+                notice.getNoticeLike(),
+                notice.getViewCount(),
+                notice.getCategory(),
+                image
             );
             noticeResponseDTOs.add(noticeDTO);
         }
@@ -403,21 +446,25 @@ public class NoticeService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         String universityName = member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
 
-        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "단과대학학생회");
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학 학생회");
 
-        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> new NoticeResponseDTO(
+        // 최신순 정렬
+        universityNotices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
+
+        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> {
+            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
+            return new NoticeResponseDTO(
                 notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
+                notice.getCreatedAt(),
                 notice.getTitle(),
                 notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
-
-
-
+                notice.getViewCount(),
+                notice.getCategory(),
+                image
+            );
+        }).collect(Collectors.toList());
         return noticeResponseDTOs;
     }
 
@@ -429,22 +476,27 @@ public class NoticeService {
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         String universityName = member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
+        String departmentName = member.getDepartmentName();
 
-        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "과학생회");
+        List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, departmentName, "학과 학생회");
 
-        List<NoticeResponseDTO> noticeResponseDTOs = universityNotices.stream().map(notice -> new NoticeResponseDTO(
+        // 최신순 정렬
+        departmentNotices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
+
+        List<NoticeResponseDTO> noticeResponseDTOs = departmentNotices.stream().map(notice -> {
+            String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
+            return new NoticeResponseDTO(
                 notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
+                notice.getCreatedAt(),
                 notice.getTitle(),
                 notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
-
-
-
-        return     noticeResponseDTOs;
+                notice.getViewCount(),
+                notice.getCategory(),
+                image
+            );
+        }).collect(Collectors.toList());
+        return noticeResponseDTOs;
     }
 
     @Transactional(readOnly = true)
@@ -463,17 +515,14 @@ public class NoticeService {
 
         return new NoticeDetailResponseDTO(
                 notice.getId(),
+                writeAffiliation,
                 notice.getTitle(),
-                notice.getContent(),
-                notice.getNoticeLike(),
-                notice.getViewCount(),
                 notice.getTarget(),
                 notice.getStartTime(),
                 notice.getEndTime(),
-                notice.getCategory(),
-                notice.getContentSummary(),
-                notice.getMember().getId(),
-                writeAffiliation, // 추가된 부분
+                notice.getContent(),
+                notice.getCreatedAt(),
+                notice.getViewCount(),
                 notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList())
         );
     }

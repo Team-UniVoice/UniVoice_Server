@@ -13,6 +13,6 @@ public class NoticeSaveDTO {
     private Long viewCount;
     private Long noticeLike;
     private String category;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+    private LocalDateTime createdAt;
+    private String image;
 }
