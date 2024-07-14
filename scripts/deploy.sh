@@ -1,17 +1,16 @@
 #!/bin/bash
-BUILD_PATH=$(ls /home/ubuntu/app/univoice-0.0.1-SNAPSHOT.jar)
+BUILD_PATH=$(ls /var/www/UniVoice_Server/build/libs/univoice-0.0.1-SNAPSHOT.jar)
 JAR_NAME=$(basename $BUILD_PATH)
 echo "> build 파일명: $JAR_NAME"
 
 echo "> build 파일 복사"
 DEPLOY_PATH=/home/ubuntu/app/
-cp $BUILD_PATH $DEPLOY_PATH
+cp -f $BUILD_PATH $DEPLOY_PATH
 
 echo "> 현재 구동중인 Port 확인"
 BLUE_PROFILE=$(curl -s http://localhost/profile)
 echo "> $BLUE_PROFILE"
 
-# 쉬고 있는 set 찾기: set1이 사용중이면 set2가 쉬고 있고, 반대면 set1이 쉬고 있음
 if [ "$BLUE_PROFILE" == "set1" ]; then
   GREEN_PROFILE=set2
   GREEN_PORT=8082
