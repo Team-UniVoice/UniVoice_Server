@@ -120,9 +120,9 @@ public class NoticeController {
     }
 
     @GetMapping ("/quick")
-    public ResponseEntity<SuccessStatusResponse<List<QuickQueryNoticeDTO>>> getQuickNoticeByUserUniversity(@RequestBody AffiliationRequestDTO request) {
+    public ResponseEntity<SuccessStatusResponse<List<QuickQueryNoticeDTO>>> getQuickNoticeDetail(@RequestBody AffiliationRequestDTO request) {
         System.out.println("Received Affiliation Request: " + request.getAffiliation());
-        List<QuickQueryNoticeDTO> response = noticeService.getQuickNoticeByUserUniversity(request.getAffiliation());
+        List<QuickQueryNoticeDTO> response = noticeService.getQuickNoticeDetail(request.getAffiliation());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_QUICK_NOTICE_SUCCESS, response));
     }

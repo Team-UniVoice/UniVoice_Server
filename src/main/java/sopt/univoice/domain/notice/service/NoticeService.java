@@ -267,34 +267,54 @@ public class NoticeService {
 
 
     @Transactional
-    public List<QuickQueryNoticeDTO> getQuickNoticeByUserUniversity(String affiliation) {
+    public List<QuickQueryNoticeDTO> getQuickNoticeDetail(String affiliation) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
         Member member = authRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
         String universityName = member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
+        String departmentName = member.getDepartmentName();
 
-        List<Notice> notices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, affiliation);
-
-        System.out.println("Notices: " + notices);
+        List<Notice> notices;
+        if ("총 학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총 학생회");
+        } else if ("단과대학 학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학 학생회");
+        } else if ("학과 학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, departmentName, "학과 학생회");
+        } else {
+            throw new IllegalArgumentException("Invalid affiliation");
+        }
 
         List<Notice> filteredNotices = notices.stream()
-                .filter(notice -> notice.getNoticeViews().stream()
-                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
-                .collect(Collectors.toList());
+                                           .filter(notice -> notice.getNoticeViews().stream()
+                                                                 .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
+                                           .collect(Collectors.toList());
 
-        System.out.println("Filtered Notices Count: " + filteredNotices.size());
+        return filteredNotices.stream().map(notice -> {
+            String writeAffiliation = "";
+            if ("총 학생회".equals(affiliation)) {
+                writeAffiliation = "총학생회 " + notice.getMember().getAffiliation().getAffiliationName();
+            } else if ("단과대학 학생회".equals(affiliation)) {
+                writeAffiliation = member.getCollegeDepartmentName() + " 학생회 " + notice.getMember().getAffiliation().getAffiliationName();
+            } else if ("학과 학생회".equals(affiliation)) {
+                writeAffiliation = member.getDepartmentName() + " 학생회 " + notice.getMember().getAffiliation().getAffiliationName();
+            }
 
-        return filteredNotices.stream().map(notice -> new QuickQueryNoticeDTO(
+            return new QuickQueryNoticeDTO(
                 notice.getId(),
+                writeAffiliation,
+                notice.getCreatedAt(),
+                notice.getViewCount(),
+                notice.getTitle(),
+                notice.getTarget(),
                 notice.getStartTime(),
                 notice.getEndTime(),
-                notice.getTitle(),
-                notice.getNoticeLike(),
-                (long) notice.getSaveNotices().size(),
-                notice.getCategory()
-        )).collect(Collectors.toList());
+                notice.getContentSummary()
+            );
+        }).collect(Collectors.toList());
     }
 
     @Transactional
