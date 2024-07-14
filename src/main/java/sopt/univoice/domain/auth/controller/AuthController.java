@@ -51,8 +51,6 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<SuccessStatusResponse<Void>> signUp(@ModelAttribute MemberCreateRequest memberCreateRequest) {
-        System.out.println(memberCreateRequest.toString());
-
 
         authService.signUp(memberCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -66,6 +64,7 @@ public class AuthController {
     public void handleSlackActions(@RequestBody Map<String, Object> payload) {
         List<Map<String, Object>> actions = (List<Map<String, Object>>) payload.get("actions");
         String actionId = (String) actions.get(0).get("action_id");
+        System.out.println("슬렉");
 
         if ("approve_action".equals(actionId)) {
             // 승인 처리 로직
