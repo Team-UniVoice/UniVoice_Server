@@ -54,13 +54,18 @@ public class NoticeService {
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         System.out.println("Member Role: " + member.getAffiliation().getRole());
 
+        String content = noticeCreateRequest.getContent();
         String summarizedContent = null;
-        try {
-            summarizedContent = openAiService.summarizeText(noticeCreateRequest.getContent());
-            System.out.println("Summarized Content: " + summarizedContent);
-        } catch (IOException e) {
-            System.err.println("Error summarizing content: " + e.getMessage());
-            e.printStackTrace();
+        if (content.length() <= 150) {
+            summarizedContent = "150자 이내인 내용 입니다\n" + content;
+        } else {
+            try {
+                summarizedContent = openAiService.summarizeText(content);
+                System.out.println("Summarized Content: " + summarizedContent);
+            } catch (IOException e) {
+                System.err.println("Error summarizing content: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
 
         // 사용자 권한 확인
