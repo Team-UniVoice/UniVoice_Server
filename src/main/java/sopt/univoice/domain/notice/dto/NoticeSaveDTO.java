@@ -16,5 +16,5 @@ public class NoticeSaveDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private LocalDateTime createdAt; // 추가된 부분
-    private LocalDateTime updatedAt; // 추가된 부분
+    private String image;
 }

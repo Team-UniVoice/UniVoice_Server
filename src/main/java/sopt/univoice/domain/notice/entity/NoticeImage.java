@@ -24,7 +24,7 @@ public class NoticeImage {
         this.noticeImage = noticeImage;
         this.notice = notice;
     }
-
-
-
+    public void setNotice(Notice notice) {
+        this.notice = notice;
+    }
 }

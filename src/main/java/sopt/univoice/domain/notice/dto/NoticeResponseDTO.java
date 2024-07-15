@@ -16,8 +16,8 @@ public class NoticeResponseDTO {
     private LocalDateTime endTime;
     private String title;
     private Long likeCount;
-    private Long saveCount;
+    private Long viewCount; // 조회수로 수정
     private String category;
-    private LocalDateTime createdAt; // 추가된 부분
-    private LocalDateTime updatedAt; // 추가된 부분
+    private LocalDateTime createdAt;
+    private String image; // 이미지 추가
 }
