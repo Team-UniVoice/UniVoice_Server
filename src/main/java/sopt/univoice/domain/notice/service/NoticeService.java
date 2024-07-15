@@ -224,7 +224,6 @@ public class NoticeService {
                             notice.getStartTime(),
                             notice.getEndTime(),
                             saveNotice.getCreatedAt(), // 추가된 부분
-                            saveNotice.getUpdatedAt(),  // 추가된 부분
                             image
                     );
                 }).sorted(Comparator.comparing(NoticeSaveDTO::getCreatedAt)) //저장된 날짜 기준 최신순 정렬
@@ -326,8 +325,7 @@ public class NoticeService {
                 notice.getNoticeLike(),
                 notice.getViewCount(),
                 notice.getCategory(),
-                notice.getCreatedAt(),
-                notice.getUpdatedAt()
+                notice.getCreatedAt()
             );
         }).collect(Collectors.toList());
     }
@@ -432,7 +430,6 @@ public class NoticeService {
                     notice.getViewCount(),
                     notice.getCategory().toString(), // assuming category is an enum or string
                     notice.getCreatedAt(),
-                    notice.getUpdatedAt(),
                     image
             );
             noticeDTOs.add(noticeDTO);
@@ -465,7 +462,6 @@ public class NoticeService {
                     notice.getViewCount(),
                     notice.getCategory().toString(), // assuming category is an enum or string
                     notice.getCreatedAt(),
-                    notice.getUpdatedAt(),
                     image // 이미지 추가
             );
             noticeDTOs.add(noticeDTO);
@@ -498,7 +494,6 @@ public class NoticeService {
                     notice.getViewCount(), // 조회수로 수정
                     notice.getCategory().toString(),// assuming category is an enum or string
                     notice.getCreatedAt(),
-                    notice.getUpdatedAt(),
                     image // 이미지 추가
             );
             noticeResponseDTOs.add(noticeDTO);
@@ -532,7 +527,6 @@ public class NoticeService {
                         notice.getViewCount(),
                         notice.getCategory(),
                         notice.getCreatedAt(),
-                        notice.getUpdatedAt(),
                         image // 이미지 추가
             );
         }).collect(Collectors.toList());
@@ -567,7 +561,6 @@ public class NoticeService {
                         notice.getViewCount(),
                         notice.getCategory(),
                         notice.getCreatedAt(),
-                        notice.getUpdatedAt(),
                         image // 이미지 추가
                     );
                 }).collect(Collectors.toList());
@@ -615,7 +608,6 @@ public class NoticeService {
                 writeAffiliation, // 추가된 부분
                 notice.getNoticeImages().stream().map(NoticeImage::getNoticeImage).collect(Collectors.toList()),
                 notice.getCreatedAt(),
-                notice.getUpdatedAt(),
                 likeCheck,
                 saveCheck, // saveCheck 로직 추가
                 dayOfWeek // dayOfWeek 추가

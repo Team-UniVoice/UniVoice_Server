@@ -18,7 +18,6 @@ public class NoticeDTO {
     private Long viewCount; // 조회수로 변경
     private String category;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private String image; // 이미지 추가
 
     public LocalDateTime getCreatedAt() {

@@ -19,6 +19,5 @@ public class NoticeResponseDTO {
     private Long viewCount; // 조회수로 수정
     private String category;
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
     private String image; // 이미지 추가
 }
