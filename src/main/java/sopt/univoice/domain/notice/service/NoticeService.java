@@ -214,6 +214,7 @@ public class NoticeService {
         return saveNotices.stream()
                 .map(saveNotice -> {
                     Notice notice = saveNotice.getNotice();
+                    String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
                     return new NoticeSaveDTO(
                             notice.getId(),
                             notice.getTitle(),
@@ -223,9 +224,10 @@ public class NoticeService {
                             notice.getStartTime(),
                             notice.getEndTime(),
                             saveNotice.getCreatedAt(), // 추가된 부분
-                            saveNotice.getUpdatedAt()  // 추가된 부분
+                            saveNotice.getUpdatedAt(),  // 추가된 부분
+                            image
                     );
-                })
+                }).sorted(Comparator.comparing(NoticeSaveDTO::getCreatedAt)) //저장된 날짜 기준 최신순 정렬
                 .collect(Collectors.toList());
     }
 
@@ -445,7 +447,7 @@ public class NoticeService {
                     notice.getCategory().toString(), // assuming category is an enum or string
                     notice.getCreatedAt(),
                     notice.getUpdatedAt(),
-                    image
+                    image // 이미지 추가
             );
             noticeDTOs.add(noticeDTO);
         }
@@ -512,7 +514,7 @@ public class NoticeService {
                         notice.getCategory(),
                         notice.getCreatedAt(),
                         notice.getUpdatedAt(),
-                        image
+                        image // 이미지 추가
             );
         }).collect(Collectors.toList());
         return noticeResponseDTOs;
@@ -547,7 +549,7 @@ public class NoticeService {
                         notice.getCategory(),
                         notice.getCreatedAt(),
                         notice.getUpdatedAt(),
-                        image
+                        image // 이미지 추가
                     );
                 }).collect(Collectors.toList());
         return noticeResponseDTOs;
