@@ -92,7 +92,7 @@ public class NoticeController {
 
     @GetMapping("/all")
     public ResponseEntity<SuccessStatusResponse<Object>> getAllNoticeByUserUniversity() {
-        List<NoticeDTO> response = noticeService.getAllNoticeByUserUniversity();
+        List<NoticeResponseDTO> response = noticeService.getAllNoticeByUserUniversity();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_NOTICE_SUCCESS, response));
     }
