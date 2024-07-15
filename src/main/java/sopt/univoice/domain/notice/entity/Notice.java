@@ -10,6 +10,7 @@ import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.infra.persistence.BaseTimeEntity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -47,7 +48,7 @@ public class Notice   extends BaseTimeEntity {
     private FirstCome firstCome;
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<NoticeImage> noticeImages;
+    private List<NoticeImage> noticeImages = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -85,6 +86,11 @@ public class Notice   extends BaseTimeEntity {
 
     public Long getViewCount() {
         return viewCount;
+    }
+
+    public void addNoticeImage(NoticeImage noticeImage) {
+        noticeImages.add(noticeImage);
+        noticeImage.setNotice(this);
     }
 
 

@@ -20,14 +20,16 @@ public class S3Service {
 
     private final String bucketName;
     private final AwsConfig awsConfig;
+    private final String region;
     private static final List<String> IMAGE_EXTENSIONS = Arrays.asList("image/jpeg", "image/png", "image/jpg", "image/webp");
 
-
-    public S3Service(@Value("${aws-property.s3-bucket-name}") final String bucketName, AwsConfig awsConfig) {
+    public S3Service(@Value("${aws-property.s3-bucket-name}") final String bucketName,
+                     AwsConfig awsConfig,
+                     @Value("${aws-property.aws-region}") final String region) {
         this.bucketName = bucketName;
         this.awsConfig = awsConfig;
+        this.region = region;
     }
-
 
     public String uploadImage(String directoryPath, MultipartFile image) throws IOException {
         final String key = directoryPath + generateImageFileName();
@@ -37,32 +39,32 @@ public class S3Service {
         validateFileSize(image);
 
         PutObjectRequest request = PutObjectRequest.builder()
-                .bucket(bucketName)
-                .key(key)
-                .contentType(image.getContentType())
-                .contentDisposition("inline")
-                .build();
+                                       .bucket(bucketName)
+                                       .key(key)
+                                       .contentType(image.getContentType())
+                                       .contentDisposition("inline")
+                                       .build();
 
         RequestBody requestBody = RequestBody.fromBytes(image.getBytes());
         s3Client.putObject(request, requestBody);
-        return key;
+
+        // Return the URL of the uploaded image
+        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, key);
     }
 
     public void deleteImage(String key) throws IOException {
         final S3Client s3Client = awsConfig.getS3Client();
 
         s3Client.deleteObject((DeleteObjectRequest.Builder builder) ->
-                builder.bucket(bucketName)
-                        .key(key)
-                        .build()
+                                  builder.bucket(bucketName)
+                                      .key(key)
+                                      .build()
         );
     }
-
 
     private String generateImageFileName() {
         return UUID.randomUUID() + ".jpg";
     }
-
 
     private void validateExtension(MultipartFile image) {
         String contentType = image.getContentType();

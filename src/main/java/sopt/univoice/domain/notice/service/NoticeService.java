@@ -91,10 +91,12 @@ public class NoticeService {
         if (noticeCreateRequest.getNoticeImages() != null) {
             for (MultipartFile file : noticeCreateRequest.getNoticeImages()) {
                 String fileName = storeFile(file); // 파일 저장 로직 필요.
+                System.out.println("Stored file name: " + fileName); // 디버깅 메시지 추가
                 NoticeImage noticeImage = NoticeImage.builder()
                         .notice(notice)
                         .noticeImage(fileName)
                         .build();
+                notice.addNoticeImage(noticeImage); // 관계 설정
                 noticeImageRepository.save(noticeImage);
                 System.out.println("NoticeImage saved successfully with file name: " + fileName);
             }
