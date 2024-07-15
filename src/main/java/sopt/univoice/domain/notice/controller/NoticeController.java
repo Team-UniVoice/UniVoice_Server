@@ -35,7 +35,7 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.LIKE_NOTICE_SUCCESS, null));
     }
 
-    @PostMapping("/like/cancle/{noticeId}")
+    @PostMapping("/like/cancel/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<Object>> likeCancleNotice(@PathVariable Long noticeId) {
 
         noticeService.likeCancleNotice(noticeId);
@@ -51,7 +51,7 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.SAVE_NOTICE_SUCCESS, null));
     }
 
-    @PostMapping("/save/cancle/{noticeId}")
+    @PostMapping("/save/cancel/{noticeId}")
     public ResponseEntity<SuccessStatusResponse<Object>> saveCancleNotice(@PathVariable Long noticeId) {
 
         noticeService.saveCancleNotice(noticeId);
