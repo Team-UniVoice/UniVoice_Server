@@ -276,7 +276,7 @@ public class NoticeService {
     }
 
 
-
+    // 퀵 스캔  안읽은 공지 리스트  가져오기
     @Transactional
     public List<QuickQueryNoticeDTO> getQuickNoticeByUserUniversity(String affiliation) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
@@ -284,36 +284,55 @@ public class NoticeService {
         Member member = authRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID"));
 
-        String universityName = member.getUniversityName();
+        String universityName =         member.getUniversityName();
+        String collegeDepartmentName = member.getCollegeDepartmentName();
+        String departmentName = member.getDepartmentName();
 
-        List<Notice> notices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, affiliation);
-
-        System.out.println("Notices: " + notices);
+        List<Notice> notices;
+        if ("총학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총학생회");
+        } else if ("단과대학학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학학생회");
+        } else if ("과학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, departmentName, "과학생회");
+        } else {
+            throw new IllegalArgumentException("Invalid affiliation");
+        }
 
         List<Notice> filteredNotices = notices.stream()
-                .filter(notice -> notice.getNoticeViews().stream()
-                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
-                .collect(Collectors.toList());
+                                           .filter(notice -> notice.getNoticeViews().stream()
+                                                                 .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
+                                           .sorted(Comparator.comparing(Notice::getCreatedAt).reversed()) // 역순 정렬
+                                           .collect(Collectors.toList());
 
-        System.out.println("Filtered Notices Count: " + filteredNotices.size());
+        return filteredNotices.stream().map(notice -> {
+            String writeAffiliation = "";
+            if ("총학생회".equals(affiliation)) {
+                writeAffiliation = "총학생회 " + notice.getMember().getAffiliation().getAffiliationName();
+            } else if ("단과대학학생회".equals(affiliation)) {
+                writeAffiliation = member.getCollegeDepartmentName() + " 학생회 " + notice.getMember().getAffiliation().getAffiliationName();
+            } else if ("과학생회".equals(affiliation)) {
+                writeAffiliation = member.getDepartmentName() + " 학생회 " + notice.getMember().getAffiliation().getAffiliationName();
+            }
 
-        return filteredNotices.stream()
-                .map(notice -> new QuickQueryNoticeDTO(
-                        notice.getId(),
-                        notice.getStartTime(),
-                        notice.getEndTime(),
-                        notice.getTitle(),
-                        notice.getNoticeLike(),
-                        (long) notice.getSaveNotices().size(),
-                        notice.getCategory(),
-                        notice.getCreatedAt(),
-                        notice.getUpdatedAt()
-                ))
-                .sorted(Comparator.comparing(QuickQueryNoticeDTO::getCreatedAt).reversed()) //내림차순
-                .collect(Collectors.toList());
+            return new QuickQueryNoticeDTO(
+                notice.getId(),
+                notice.getStartTime(),
+                notice.getEndTime(),
+                notice.getTitle(),
+                notice.getTarget(),
+                writeAffiliation,
+                notice.getContentSummary(),
+                notice.getNoticeLike(),
+                notice.getViewCount(),
+                notice.getCategory(),
+                notice.getCreatedAt(),
+                notice.getUpdatedAt()
+            );
+        }).collect(Collectors.toList());
     }
 
-
+    // 퀵 스캔 헤드 가져오기
     @Transactional
     public QuickScanDTO quickhead() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
