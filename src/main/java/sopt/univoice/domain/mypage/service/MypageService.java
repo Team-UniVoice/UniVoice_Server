@@ -26,6 +26,7 @@ public class MypageService {
             member.getCollegeDepartmentName(),
             member.getDepartmentName(),
             member.getAdmissionNumber() + "학번",
+            member.getUniversityName(),
             member.getUniversityLogoImage()
         );
             return getMypage;

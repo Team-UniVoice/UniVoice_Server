@@ -11,5 +11,6 @@ public class GetMypageReponseDto {
     private String collegeDepartment;
     private String department;
     private String admissionNumber;
+    private String university;
     private String universityLogoImage;
 }
