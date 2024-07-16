@@ -127,7 +127,7 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_DEPARTMENT_NOTICE_SUCCESS, response));
     }
 
-    @GetMapping ("/quick")
+    @PostMapping ("/quick")
     public ResponseEntity<SuccessStatusResponse<List<QuickQueryNoticeDTO>>> getQuickNoticeByUserUniversity(@RequestBody AffiliationRequestDTO request) {
 
         List<QuickQueryNoticeDTO> response = noticeService.getQuickNoticeByUserUniversity(request.getAffiliation());
