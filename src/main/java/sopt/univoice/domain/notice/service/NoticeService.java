@@ -307,7 +307,7 @@ public class NoticeService {
         return filteredNotices.stream().map(notice -> {
             String writeAffiliation = "";
             if ("총학생회".equals(affiliation)) {
-                writeAffiliation = member.getUniversityName() + "총학생회";
+                writeAffiliation = member.getUniversityName() + " 총학생회";
             } else if ("단과대학학생회".equals(affiliation)) {
                 writeAffiliation = member.getCollegeDepartmentName() + " 학생회";
             } else if ("과학생회".equals(affiliation)) {
