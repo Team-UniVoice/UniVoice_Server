@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import sopt.univoice.domain.notice.dto.*;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.service.NoticeService;
+import sopt.univoice.domain.universityData.entity.Department;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
 
@@ -99,8 +100,8 @@ public class NoticeController {
 
 
 
-    @PostMapping("/university")
-    public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity() {
+    @GetMapping("/university")
+    public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity(@RequestBody Department department) {
         List<NoticeDTO> response = noticeService.getUniversityNoticeByUserUniversity();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_UNIVERSITY_NOTICE_SUCCESS, response));
@@ -108,7 +109,7 @@ public class NoticeController {
 
 
 
-    @PostMapping("/college-department")
+    @GetMapping("/college-department")
     public ResponseEntity<SuccessStatusResponse<Object>> getCollegeDepartmentNoticeByUserUniversity() {
         List<NoticeResponseDTO> response = noticeService.getCollegeDepartmentNoticeByUserUniversity();
 
@@ -117,7 +118,7 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_COLLEGE_NOTICE_SUCCESS, response));
     }
 
-    @PostMapping("/department")
+    @GetMapping("/department")
     public ResponseEntity<SuccessStatusResponse<Object>> getDepartmentNoticeByUserUniversity() {
         List<NoticeResponseDTO> response = noticeService.getDepartmentNoticeByUserUniversity();
 
