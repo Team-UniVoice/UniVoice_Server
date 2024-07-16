@@ -350,19 +350,34 @@ public class NoticeService {
         String departmentLogoImage = null;
 
         // '총학생회'에 대한 로고 이미지 가져오기
-        Affiliation universityAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("총학생회", universityName);
+        Affiliation universityAffiliation = universityNotices.stream()
+                                                .map(Notice::getMember)
+                                                .map(Member::getAffiliation)
+                                                .filter(a -> "총학생회".equals(a.getAffiliation()))
+                                                .findFirst()
+                                                .orElse(null);
         if (universityAffiliation != null) {
             universityLogoImage = universityAffiliation.getAffiliationLogoImage();
         }
 
         // '단과대학학생회'에 대한 로고 이미지 가져오기
-        Affiliation collegeAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("단과대학학생회", universityName);
+        Affiliation collegeAffiliation = collegeNotices.stream()
+                                             .map(Notice::getMember)
+                                             .map(Member::getAffiliation)
+                                             .filter(a -> "단과대학학생회".equals(a.getAffiliation()))
+                                             .findFirst()
+                                             .orElse(null);
         if (collegeAffiliation != null) {
             collegeDepartmentLogoImage = collegeAffiliation.getAffiliationLogoImage();
         }
 
         // '과학생회'에 대한 로고 이미지 가져오기
-        Affiliation departmentAffiliation = affiliationRepository.findByAffiliationAndAffiliationUniversityName("과학생회", universityName);
+        Affiliation departmentAffiliation = departmentNotices.stream()
+                                                .map(Notice::getMember)
+                                                .map(Member::getAffiliation)
+                                                .filter(a -> "과학생회".equals(a.getAffiliation()))
+                                                .findFirst()
+                                                .orElse(null);
         if (departmentAffiliation != null) {
             departmentLogoImage = departmentAffiliation.getAffiliationLogoImage();
         }
