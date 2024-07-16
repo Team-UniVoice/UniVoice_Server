@@ -288,8 +288,8 @@ public class NoticeService {
         String departmentName = member.getDepartmentName();
 
         List<Notice> notices;
-        if ("총 학생회".equals(affiliation)) {
-            notices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총 학생회");
+        if ("총학생회".equals(affiliation)) {
+            notices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총학생회");
         } else if ("단과대학 학생회".equals(affiliation)) {
             notices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학 학생회");
         } else if ("학과 학생회".equals(affiliation)) {
@@ -306,7 +306,7 @@ public class NoticeService {
 
         return filteredNotices.stream().map(notice -> {
             String writeAffiliation = "";
-            if ("총 학생회".equals(affiliation)) {
+            if ("총학생회".equals(affiliation)) {
                 writeAffiliation = member.getUniversityName() + " 총학생회";
             } else if ("단과대학 학생회".equals(affiliation)) {
                 writeAffiliation = member.getCollegeDepartmentName() + " 학생회";
@@ -341,7 +341,7 @@ public class NoticeService {
         String collegeDepartmentName = member.getCollegeDepartmentName();
         String departmentName = member.getDepartmentName();
 
-        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총 학생회");
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndAffiliationAffiliation(universityName, "총학생회");
         List<Notice> collegeNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학 학생회");
         List<Notice> departmentNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, departmentName, "학과 학생회");
 
@@ -353,7 +353,7 @@ public class NoticeService {
         Affiliation universityAffiliation = universityNotices.stream()
                                                 .map(Notice::getMember)
                                                 .map(Member::getAffiliation)
-                                                .filter(a -> "총 학생회".equals(a.getAffiliation()))
+                                                .filter(a -> "총학생회".equals(a.getAffiliation()))
                                                 .findFirst()
                                                 .orElse(null);
         if (universityAffiliation != null) {
@@ -436,7 +436,7 @@ public class NoticeService {
         String departmentName = member.getDepartmentName();
 
         // 총학생회 공지 조회
-        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총 학생회");
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총학생회");
 
         // 단과대학 공지 조회
         List<Notice> collegeDepartmentNotices = noticeRepository.findByMemberUniversityNameAndMemberCollegeDepartmentNameAndMemberAffiliationAffiliation(universityName, collegeDepartmentName, "단과대학 학생회");
@@ -481,7 +481,7 @@ public class NoticeService {
 
         String universityName = member.getUniversityName();
 
-        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총 학생회");
+        List<Notice> universityNotices = noticeRepository.findByMemberUniversityNameAndMemberAffiliationAffiliation(universityName, "총학생회");
 
         // 최신순 정렬 (즉, 제일 최근에 올린 공지가 맨 위, 전에 올렸던 공지는 아래)
         universityNotices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
