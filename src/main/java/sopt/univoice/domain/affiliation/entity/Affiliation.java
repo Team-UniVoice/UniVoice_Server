@@ -36,22 +36,18 @@ public class Affiliation extends BaseTimeEntity {
     @OneToMany(mappedBy = "affiliation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members;
 
-
-
-
-
-
-
-
-
     // 새로운 생성자 추가
     @Builder
-    public Affiliation(Role role) {
+    public Affiliation(Role role, String affiliation) {
         this.role = role;
+        this.affiliation = affiliation;
     }
 
     public static Affiliation createDefault() {
-        return Affiliation.builder().role(Role.UNUSER).build();
+        return Affiliation.builder()
+                   .role(Role.APPROVEADMIN)
+                   .affiliation("총학생회")
+                   .build();
     }
 
 }
