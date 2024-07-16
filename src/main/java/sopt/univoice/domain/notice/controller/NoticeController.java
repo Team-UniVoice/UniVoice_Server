@@ -99,7 +99,7 @@ public class NoticeController {
 
 
 
-    @GetMapping("/university")
+    @PostMapping("/university")
     public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity() {
         List<NoticeDTO> response = noticeService.getUniversityNoticeByUserUniversity();
         return ResponseEntity.status(HttpStatus.OK)
@@ -108,7 +108,7 @@ public class NoticeController {
 
 
 
-    @GetMapping("/college-department")
+    @PostMapping("/college-department")
     public ResponseEntity<SuccessStatusResponse<Object>> getCollegeDepartmentNoticeByUserUniversity() {
         List<NoticeResponseDTO> response = noticeService.getCollegeDepartmentNoticeByUserUniversity();
 
@@ -117,7 +117,7 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_COLLEGE_NOTICE_SUCCESS, response));
     }
 
-    @GetMapping("/department")
+    @PostMapping("/department")
     public ResponseEntity<SuccessStatusResponse<Object>> getDepartmentNoticeByUserUniversity() {
         List<NoticeResponseDTO> response = noticeService.getDepartmentNoticeByUserUniversity();
 
