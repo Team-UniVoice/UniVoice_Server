@@ -101,7 +101,7 @@ public class NoticeController {
 
 
     @GetMapping("/university")
-    public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity(@RequestBody Department department) {
+    public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity() {
         List<NoticeDTO> response = noticeService.getUniversityNoticeByUserUniversity();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_UNIVERSITY_NOTICE_SUCCESS, response));
