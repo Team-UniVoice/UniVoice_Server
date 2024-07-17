@@ -20,5 +20,6 @@ public class QuickQueryNoticeDTO {
     private String category;
     private LocalDateTime createdAt; // 추가된 부분
     private  String logoImage;
+    private  Boolean saveCheck;
 }
 

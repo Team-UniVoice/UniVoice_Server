@@ -351,13 +351,8 @@ public class NoticeService {
             }
 
 
-
-            System.out.println("ddd"+logoImage);
-
-
-
-
-
+            // saveCheck 로직 추가
+            boolean saveCheck = saveNoticeRepository.existsByMemberIdAndNoticeId(memberId, notice.getId());
 
             return new QuickQueryNoticeDTO(
                     notice.getId(),
@@ -371,7 +366,8 @@ public class NoticeService {
                     notice.getViewCount(),
                     notice.getCategory(),
                     notice.getCreatedAt(),
-                    logoImage
+                    logoImage,
+                    saveCheck
 
             );
         }).collect(Collectors.toList());
