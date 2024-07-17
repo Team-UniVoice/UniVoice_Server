@@ -34,6 +34,9 @@
 ## 🏫 ERD
 ![Untitled (8)](https://github.com/Team-UniVoice/UniVoice_Server/assets/137388764/4f717348-404e-4a94-9da4-121f2166bf17)
 
+## 🌠Architecture 
+![image](https://github.com/user-attachments/assets/3f92cb24-accc-43be-b3e3-c2d50b5dd9a1)
+
 
 ## 🏫 Structure
 
