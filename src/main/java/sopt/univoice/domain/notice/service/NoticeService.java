@@ -299,10 +299,10 @@ public class NoticeService {
         }
 
         List<Notice> filteredNotices = notices.stream()
-                                           .filter(notice -> notice.getNoticeViews().stream()
-                                                                 .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
-                                           .sorted(Comparator.comparing(Notice::getCreatedAt).reversed()) // 역순 정렬
-                                           .collect(Collectors.toList());
+                .filter(notice -> notice.getNoticeViews().stream()
+                        .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
+                .sorted(Comparator.comparing(Notice::getCreatedAt).reversed()) // 역순 정렬
+                .collect(Collectors.toList());
 
         return filteredNotices.stream().map(notice -> {
             String writeAffiliation = "";
@@ -314,18 +314,61 @@ public class NoticeService {
                 writeAffiliation = member.getDepartmentName() + " 학생회";
             }
 
+            String logoImage = null;
+
+
+            Affiliation universityAffiliation = filteredNotices.stream()
+                    .map(Notice::getMember)
+                    .map(Member::getAffiliation)
+                    .filter(a -> "총학생회".equals(a.getAffiliation()))
+                    .findFirst()
+                    .orElse(null);
+            if (universityAffiliation != null) {
+                logoImage = universityAffiliation.getAffiliationLogoImage();
+            }
+
+
+            // '단과대학학생회'에 대한 로고 이미지 가져오기
+            Affiliation collegeAffiliation = filteredNotices.stream()
+                    .map(Notice::getMember)
+                    .map(Member::getAffiliation)
+                    .filter(a -> "단과대학 학생회".equals(a.getAffiliation()))
+                    .findFirst()
+                    .orElse(null);
+            if (collegeAffiliation != null) {
+                logoImage = collegeAffiliation.getAffiliationLogoImage();
+            }
+
+            // '과학생회'에 대한 로고 이미지 가져오기
+            Affiliation departmentAffiliation = filteredNotices.stream()
+                    .map(Notice::getMember)
+                    .map(Member::getAffiliation)
+                    .filter(a -> "학과 학생회".equals(a.getAffiliation()))
+                    .findFirst()
+                    .orElse(null);
+            if (departmentAffiliation != null) {
+                logoImage = departmentAffiliation.getAffiliationLogoImage();
+            }
+
+
+            // saveCheck 로직 추가
+            boolean saveCheck = saveNoticeRepository.existsByMemberIdAndNoticeId(memberId, notice.getId());
+
             return new QuickQueryNoticeDTO(
-                notice.getId(),
-                notice.getStartTime(),
-                notice.getEndTime(),
-                notice.getTitle(),
-                notice.getTarget(),
-                writeAffiliation,
-                notice.getContentSummary(),
-                notice.getNoticeLike(),
-                notice.getViewCount(),
-                notice.getCategory(),
-                notice.getCreatedAt()
+                    notice.getId(),
+                    notice.getStartTime(),
+                    notice.getEndTime(),
+                    notice.getTitle(),
+                    notice.getTarget(),
+                    writeAffiliation,
+                    notice.getContentSummary(),
+                    notice.getNoticeLike(),
+                    notice.getViewCount(),
+                    notice.getCategory(),
+                    notice.getCreatedAt(),
+                    logoImage,
+                    saveCheck
+
             );
         }).collect(Collectors.toList());
     }
