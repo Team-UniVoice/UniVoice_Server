@@ -17,6 +17,8 @@ public class University {
 
     private String universityName;
 
+    private String universityLogoImage;
+
     @OneToMany(mappedBy = "university")
     private List<CollegeDepartment> collegeDepartments;
 
