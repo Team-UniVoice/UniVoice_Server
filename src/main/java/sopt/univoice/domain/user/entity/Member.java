@@ -43,8 +43,6 @@ public class Member extends BaseTimeEntity {
 
     private String departmentName;
 
-    private String universityLogoImage;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "affiliation_id")
     private Affiliation affiliation;
