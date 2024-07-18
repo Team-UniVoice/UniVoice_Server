@@ -36,9 +36,8 @@ dependencies {
 	implementation 'org.json:json:20210307'
 
 	// Slack API 라이브러리 버전 일치
-	implementation 'com.slack.api:slack-app-backend:1.30.0'
-	implementation 'com.slack.api:slack-api-model:1.30.0'
 	implementation 'com.slack.api:slack-api-client:1.30.0'
+
 
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
