@@ -7,7 +7,9 @@ import com.slack.api.model.block.element.BlockElement;
 import com.slack.api.webhook.Payload;
 import com.slack.api.webhook.WebhookResponse;
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,23 +36,20 @@ import sopt.univoice.infra.common.exception.message.ErrorMessage;
 import sopt.univoice.infra.common.jwt.JwtTokenProvider;
 import sopt.univoice.infra.external.S3Service;
 
-import com.slack.api.model.block.Blocks;
-import com.slack.api.model.block.composition.BlockCompositions;
-import com.slack.api.model.block.element.BlockElements;
+
 
 import java.io.IOException;
 import java.util.*;
 
-import static com.slack.api.model.block.composition.BlockCompositions.plainText;
-import static com.slack.api.model.block.element.BlockElements.asElements;
+
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
-
+    @Value("${slack.webhook-url}")
+    private String webhookUrl;
     private static final String S3_BUCKET_URL = "https://uni-voice-bucket.s3.ap-northeast-2.amazonaws.com/";
 
 
@@ -148,7 +147,7 @@ public class AuthService {
 
         try {
             String payload = objectMapper.writeValueAsString(messageData);
-            WebhookResponse response = slack.send(WEBHOOK_URL, payload);
+            WebhookResponse response = slack.send(webhookUrl, payload);
             log.info("Slack response: {}", response);
         } catch (IOException e) {
             log.error("Slack 메시지 전송에 실패했습니다: {}", e.getMessage(), e);
