@@ -50,7 +50,7 @@ import static com.slack.api.model.block.element.BlockElements.asElements;
 @RequiredArgsConstructor
 public class AuthService {
 
-    final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
+    final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
     private static final String S3_BUCKET_URL = "https://uni-voice-bucket.s3.ap-northeast-2.amazonaws.com/";
 
 
