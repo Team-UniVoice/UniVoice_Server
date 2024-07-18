@@ -50,7 +50,9 @@ import static com.slack.api.model.block.element.BlockElements.asElements;
 @RequiredArgsConstructor
 public class AuthService {
 
-    final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
+    final String WEBHOOK_URL = "https://hooks.slack.com/services/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g3";
+
+
     private static final String S3_BUCKET_URL = "https://uni-voice-bucket.s3.ap-northeast-2.amazonaws.com/";
 
 
@@ -170,7 +172,7 @@ public class AuthService {
                 member.getStudentNumber(),
                 member.getEmail(),
                 member.getPassword(),
-                member.getStudentCardImage(),
+                S3_BUCKET_URL + member.getStudentCardImage(),
                 member.getUniversityName(),
                 member.getCollegeDepartmentName(),
                 member.getDepartmentName()
