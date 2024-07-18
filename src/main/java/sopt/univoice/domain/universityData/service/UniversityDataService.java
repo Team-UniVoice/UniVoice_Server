@@ -19,17 +19,6 @@ public class UniversityDataService {
 
     public List<String> getAllUniversityNames() {
         List<University> universities = universityDataRepository.findAll();
-        final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
-
-
-
-
-
-
-
-
-
-
         return universities.stream()
                 .map(University::getUniversityName)
                 .collect(Collectors.toList());
