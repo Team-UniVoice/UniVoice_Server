@@ -36,6 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         WHITE_LIST_PATHS.add("/api/v1/auth/check-email");
         WHITE_LIST_PATHS.add("/api/v1/auth/signup");
         WHITE_LIST_PATHS.add("/api/v1/auth/accecpt");
+        WHITE_LIST_PATHS.add("/api/v1/profile");
     }
 
     @Override
@@ -45,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 화이트리스트 경로인 경우 필터를 통과시킴
         System.out.println("Request URI(filter): " + request.getRequestURI());
         if (WHITE_LIST_PATHS.contains(request.getRequestURI())) {
+            System.out.println("Whitelist path, skipping authentication");
             filterChain.doFilter(request, response);
             return;
         }

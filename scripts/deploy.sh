@@ -74,7 +74,7 @@ do
 done
 
 echo "> $BLUE_PROFILE 에서 구동중인 애플리케이션 pid 확인"
-BLUE_PID=$(pgrep -f $BLUE_PROFILE-nowsopt.jar)
+BLUE_PID=$(pgrep -f $BLUE_PROFILE-univoice.jar)
 
 if [ -z $BLUE_PID ]
 then
