@@ -30,7 +30,8 @@ public class SecurityConfig {
             "/api/v1/auth/check-email",
             "/api/v1/auth/signup",
             "/api/v1/auth/accecpt",
-            "api/v1/auth/"
+            "api/v1/auth/",
+            "api/v1/profile"
     };
 
     @Bean
