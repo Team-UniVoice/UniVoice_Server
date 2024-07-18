@@ -24,7 +24,7 @@ public class UniversityDataController {
 
     private final UniversityDataService universityDataService;
     private final ObjectMapper objectMapper;
-    final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
+    final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
 
 
     @PostMapping("/university")

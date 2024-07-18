@@ -7,6 +7,7 @@ import com.slack.api.model.block.element.BlockElement;
 import com.slack.api.webhook.Payload;
 import com.slack.api.webhook.WebhookResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -38,20 +39,17 @@ import com.slack.api.model.block.composition.BlockCompositions;
 import com.slack.api.model.block.element.BlockElements;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static com.slack.api.model.block.composition.BlockCompositions.plainText;
 import static com.slack.api.model.block.element.BlockElements.asElements;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    final String WEBHOOK_URL = "https://hooks.slack.com/services/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g3";
-
+    final String WEBHOOK_URL = "https://hooks.slack.com/services/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";
 
     private static final String S3_BUCKET_URL = "https://uni-voice-bucket.s3.ap-northeast-2.amazonaws.com/";
 
@@ -73,39 +71,7 @@ public class AuthService {
 
 
 
-    private LayoutBlock getHeader(String text) {
-        return Blocks.header(h -> h.text(
-                BlockCompositions.plainText(pt -> pt.emoji(true).text(text))));
-    }
 
-    private LayoutBlock getSection(String message) {
-        return Blocks.section(s -> s.text(
-                BlockCompositions.markdownText(message)));
-    }
-
-    private BlockElement getActionButton(String plainText, String value, String style, String actionId) {
-        return BlockElements.button(b -> b.text(plainText(pt -> pt.text(plainText).emoji(true)))
-                .value(value)
-                .style(style)
-                .actionId(actionId));
-    }
-
-    private List<BlockElement> getActionBlocks() {
-        List<BlockElement> actions = new ArrayList<>();
-        actions.add(getActionButton("승인", "approve", "primary", "approve_action"));
-        actions.add(getActionButton("거절", "reject", "danger", "reject_action"));
-        return actions;
-    }
-
-    private List<LayoutBlock> createSlackMessageBlocks(String formattedMessage) {
-        return Arrays.asList(
-                getHeader("새로운 회원 가입 알림"),
-                Blocks.divider(),
-                getSection(formattedMessage),
-                Blocks.divider(),
-                Blocks.actions(actions -> actions.elements(getActionBlocks()))
-        );
-    }
 
     // 회원 가입 메서드 수정
     @Transactional
@@ -156,7 +122,9 @@ public class AuthService {
 
         authRepository.save(member);
 
-        String formattedMessage = String.format(
+        // 슬랙 메시지 전송을 위한 JSON 형식의 데이터 구성
+        Map<String, String> messageData = new HashMap<>();
+        messageData.put("text", String.format(
                 "새로운 회원 가입:\n" +
                         "\"admissionNumber\" : %d\n" +
                         "\"name\" : \"%s\"\n" +
@@ -172,26 +140,20 @@ public class AuthService {
                 member.getStudentNumber(),
                 member.getEmail(),
                 member.getPassword(),
-                S3_BUCKET_URL + member.getStudentCardImage(),
+                member.getStudentCardImage(),
                 member.getUniversityName(),
                 member.getCollegeDepartmentName(),
                 member.getDepartmentName()
-        );
-
-        List<LayoutBlock> blocks = createSlackMessageBlocks(formattedMessage);
+        ));
 
         try {
-            Payload payload = Payload.builder()
-                    .blocks(blocks)
-                    .build();
+            String payload = objectMapper.writeValueAsString(messageData);
             WebhookResponse response = slack.send(WEBHOOK_URL, payload);
-            System.out.println("Slack response: " + response);
+            log.info("Slack response: {}", response);
         } catch (IOException e) {
-            System.err.println("Slack 메시지 전송에 실패했습니다: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Slack 메시지 전송에 실패했습니다: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
-
         // NoticeView 엔티티 생성 및 저장
         List<Notice> notices = noticeRepository.findAllByMemberUniversityName(member.getUniversityName());
         for (Notice notice : notices) {
