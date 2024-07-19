@@ -83,7 +83,7 @@ public class AuthService {
         } catch (IOException e) {
             System.err.println("이미지 업로드에 실패했습니다: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("이미지 업로드에 실패했습니다.", e);
+            throw new RuntimeException("이미지 업로드에 실패했습니다.!", e);
         }
 
         List<Department> departments = departmentRepository.findByDepartmentName(memberCreateRequest.getDepartmentName());
