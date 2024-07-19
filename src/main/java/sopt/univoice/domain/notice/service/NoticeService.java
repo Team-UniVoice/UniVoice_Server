@@ -56,7 +56,7 @@ public class NoticeService {
         String content = noticeCreateRequest.getContent();
         String summarizedContent = null;
         if (content.length() <= 150) {
-            summarizedContent = "150자 이내인 내용 입니다\n" + content;
+            summarizedContent = content;
         } else {
             try {
                 summarizedContent = openAiService.summarizeText(content);
@@ -226,7 +226,7 @@ public class NoticeService {
                             saveNotice.getCreatedAt(), // 추가된 부분
                             image
                     );
-                }).sorted(Comparator.comparing(NoticeSaveDTO::getCreatedAt)) //저장된 날짜 기준 최신순 정렬
+                }).sorted(Comparator.comparing(NoticeSaveDTO::getCreatedAt).reversed())
                 .collect(Collectors.toList());
     }
 
