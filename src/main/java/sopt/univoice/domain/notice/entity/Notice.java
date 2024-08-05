@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import sopt.univoice.domain.firstcome.entity.FirstCome;
 import sopt.univoice.domain.user.entity.Member;
 import sopt.univoice.infra.persistence.BaseTimeEntity;
 
@@ -44,8 +43,6 @@ public class Notice   extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToOne(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
-    private FirstCome firstCome;
 
     @OneToMany(mappedBy = "notice", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NoticeImage> noticeImages = new ArrayList<>();
