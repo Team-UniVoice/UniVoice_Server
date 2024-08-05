@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import sopt.univoice.domain.affiliation.entity.Affiliation;
 import sopt.univoice.domain.affiliation.repository.AffiliationRepository;
 import sopt.univoice.domain.auth.UserAuthentication;
@@ -42,7 +43,6 @@ import java.io.IOException;
 import java.util.*;
 
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -51,7 +51,6 @@ public class AuthService {
     @Value("${slack.webhook-url}")
     private String webhookUrl;
     private static final String S3_BUCKET_URL = "https://uni-voice-bucket.s3.ap-northeast-2.amazonaws.com/";
-
 
     private final AuthRepository authRepository;
     private final S3Service s3Service;
@@ -64,64 +63,95 @@ public class AuthService {
     private final NoticeRepository noticeRepository;
     private final NoticeViewRepository noticeViewRepository;
 
+
+
+    @Transactional
+    public void signUp(MemberCreateRequest memberCreateRequest) {
+        String imageUrl = uploadStudentCardImage(memberCreateRequest.getStudentCardImage());
+        Department department = validateAndGetDepartment(memberCreateRequest.getDepartmentName());
+        CollegeDepartment collegeDepartment = validateAndGetCollegeDepartment(department);
+        Affiliation affiliation = createAffiliation();
+        Member member = createMember(memberCreateRequest, imageUrl, department, collegeDepartment, affiliation);
+
+        authRepository.save(member);
+        sendSlackNotification(member);
+        createAndSaveNoticeViews(member);
+    }
+
+    @Transactional
+    public UserLoginResponse logineMember(MemberSignInRequest memberSignInRequest) {
+        Member member = authRepository.findByEmail(memberSignInRequest.getEmail())
+                .orElseThrow(() -> new UnauthorizedException(ErrorMessage.JWT_LOGIN_PASSWORD_EXCEPTION));
+
+        if (!passwordEncoder.matches(memberSignInRequest.getPassword(), member.getPassword())) {
+            throw new UnauthorizedException(ErrorMessage.JWT_LOGIN_PASSWORD_EXCEPTION);
+        }
+
+        Long memberId = member.getId();
+        Collection<? extends GrantedAuthority> authorities = member.getAuthorities();
+        String accessToken = jwtTokenProvider.issueAccessToken(
+                UserAuthentication.createUserAuthentication(memberId, authorities)
+        );
+
+        return UserLoginResponse.of(accessToken);
+    }
+
+
     public boolean isDuplicateEmail(CheckEmailRequest checkEmailRequest) {
         return authRepository.existsByEmail(checkEmailRequest.getEmail());
     }
 
-
-
-
-
-    // 회원 가입 메서드 수정
-    @Transactional
-    public void signUp(MemberCreateRequest memberCreateRequest) {
-        Slack slack = Slack.getInstance();
-        String imageUrl = null;
-
+    private String uploadStudentCardImage(MultipartFile studentCardImage) {
         try {
-            imageUrl = s3Service.uploadImage("student-card-images/", memberCreateRequest.getStudentCardImage());
+            return s3Service.uploadImage("student-card-images/", studentCardImage);
         } catch (IOException e) {
-            System.err.println("이미지 업로드에 실패했습니다: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("이미지 업로드에 실패했습니다.!", e);
+            log.error("이미지 업로드에 실패했습니다: {}", e.getMessage(), e);
+            throw new RuntimeException("이미지 업로드에 실패했습니다!", e);
         }
+    }
 
-        List<Department> departments = departmentRepository.findByDepartmentName(memberCreateRequest.getDepartmentName());
+    private Department validateAndGetDepartment(String departmentName) {
+        List<Department> departments = departmentRepository.findByDepartmentName(departmentName);
         if (departments.isEmpty()) {
-            System.err.println("해당 학과가 존재하지 않습니다.");
+            log.error("해당 학과가 존재하지 않습니다.");
             throw new RuntimeException("해당 학과가 존재하지 않습니다.");
         }
+        return departments.get(0);
+    }
 
-        Department department = departments.get(0);
-
-        CollegeDepartment collegeDepartment = collegeDepartmentRepository.findById(department.getCollegeDepartment().getId())
+    private CollegeDepartment validateAndGetCollegeDepartment(Department department) {
+        return collegeDepartmentRepository.findById(department.getCollegeDepartment().getId())
                 .orElseThrow(() -> {
-                    System.err.println("해당 단과대학이 존재하지 않습니다.");
+                    log.error("해당 단과대학이 존재하지 않습니다.");
                     return new RuntimeException("해당 단과대학이 존재하지 않습니다.");
                 });
+    }
 
+    private Affiliation createAffiliation() {
         Affiliation affiliation = Affiliation.createDefault();
         affiliationRepository.save(affiliation);
+        return affiliation;
+    }
 
-        // 비밀번호 해시
-        String hashedPassword = passwordEncoder.encode(memberCreateRequest.getPassword());
+    private Member createMember(MemberCreateRequest request, String imageUrl, Department department, CollegeDepartment collegeDepartment, Affiliation affiliation) {
+        String hashedPassword = passwordEncoder.encode(request.getPassword());
 
-        Member member = Member.builder()
-                .admissionNumber(memberCreateRequest.getAdmissionNumber())
-                .name(memberCreateRequest.getName())
-                .studentNumber(memberCreateRequest.getStudentNumber())
-                .email(memberCreateRequest.getEmail())
+        return Member.builder()
+                .admissionNumber(request.getAdmissionNumber())
+                .name(request.getName())
+                .studentNumber(request.getStudentNumber())
+                .email(request.getEmail())
                 .password(hashedPassword)
                 .studentCardImage(imageUrl)
-                .universityName(memberCreateRequest.getUniversityName())
-                .departmentName(memberCreateRequest.getDepartmentName())
+                .universityName(request.getUniversityName())
+                .departmentName(department.getDepartmentName())
                 .collegeDepartmentName(collegeDepartment.getCollegeDepartmentName())
                 .affiliation(affiliation)
                 .build();
+    }
 
-        authRepository.save(member);
-
-        // 슬랙 메시지 전송을 위한 JSON 형식의 데이터 구성
+    private void sendSlackNotification(Member member) {
+        Slack slack = Slack.getInstance();
         Map<String, String> messageData = new HashMap<>();
         messageData.put("text", String.format(
                 "새로운 회원 가입:\n" +
@@ -153,7 +183,9 @@ public class AuthService {
             log.error("Slack 메시지 전송에 실패했습니다: {}", e.getMessage(), e);
             throw new RuntimeException(e);
         }
-        // NoticeView 엔티티 생성 및 저장
+    }
+
+    private void createAndSaveNoticeViews(Member member) {
         List<Notice> notices = noticeRepository.findAllByMemberUniversityName(member.getUniversityName());
         for (Notice notice : notices) {
             NoticeView noticeView = NoticeView.builder()
@@ -165,24 +197,8 @@ public class AuthService {
         }
     }
 
-    @Transactional
-    public UserLoginResponse logineMember(
-            MemberSignInRequest memberSignInRequest
-    ) {
-        Member member = authRepository.findByEmail(memberSignInRequest.getEmail())
-                .orElseThrow(() -> new UnauthorizedException(ErrorMessage.JWT_LOGIN_PASSWORD_EXCEPTION));
 
-        if (!passwordEncoder.matches(memberSignInRequest.getPassword(), member.getPassword())) {
-            throw new UnauthorizedException(ErrorMessage.JWT_LOGIN_PASSWORD_EXCEPTION);
-        }
 
-        Long memberId = member.getId();
-        Collection<? extends GrantedAuthority> authorities = member.getAuthorities(); // 역할 정보 가져오기
-        String accessToken = jwtTokenProvider.issueAccessToken(
-                UserAuthentication.createUserAuthentication(memberId, authorities)
-        );
-
-        return UserLoginResponse.of(accessToken);
-    }
 
 }
+
