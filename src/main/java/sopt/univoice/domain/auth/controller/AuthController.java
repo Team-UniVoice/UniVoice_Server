@@ -36,12 +36,9 @@ public class AuthController {
         }
     }
 
-
     @PostMapping("/signin")
     public ResponseEntity<SuccessStatusResponse<UserLoginResponse>>signIn(@RequestBody MemberSignInRequest memberSignInRequest) {
-
         UserLoginResponse userLoginResponse = authService.logineMember(memberSignInRequest);
-
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.SIGNIN_SUCCESS, userLoginResponse));
     }
@@ -53,9 +50,6 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SuccessStatusResponse.of(SuccessMessage.SIGNUP_SUCCESS, null));
     }
-
-
-
 
     @PostMapping("/slack/actions")
     public void handleSlackActions(@RequestBody Map<String, Object> payload) {
@@ -71,15 +65,4 @@ public class AuthController {
             System.out.println("거절 버튼 클릭됨");
         }
     }
-
-
-
-
-
-
-
-
-
-
-
 }
