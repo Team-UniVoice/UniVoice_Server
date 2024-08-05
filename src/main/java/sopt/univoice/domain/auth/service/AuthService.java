@@ -67,8 +67,8 @@ public class AuthService {
 
     @Transactional
     public void signUp(MemberCreateRequest memberCreateRequest) {
-        String imageUrl = uploadStudentCardImage(memberCreateRequest.getStudentCardImage());
-        Department department = validateAndGetDepartment(memberCreateRequest.getDepartmentName());
+        String imageUrl = uploadStudentCardImage(memberCreateRequest.studentCardImage());
+        Department department = validateAndGetDepartment(memberCreateRequest.departmentName());
         CollegeDepartment collegeDepartment = validateAndGetCollegeDepartment(department);
         Affiliation affiliation = createAffiliation();
         Member member = createMember(memberCreateRequest, imageUrl, department, collegeDepartment, affiliation);
@@ -77,6 +77,7 @@ public class AuthService {
         sendSlackNotification(member);
         createAndSaveNoticeViews(member);
     }
+
 
     @Transactional
     public UserLoginResponse logineMember(MemberSignInRequest memberSignInRequest) {
@@ -134,21 +135,22 @@ public class AuthService {
     }
 
     private Member createMember(MemberCreateRequest request, String imageUrl, Department department, CollegeDepartment collegeDepartment, Affiliation affiliation) {
-        String hashedPassword = passwordEncoder.encode(request.getPassword());
+        String hashedPassword = passwordEncoder.encode(request.password());
 
         return Member.builder()
-                .admissionNumber(request.getAdmissionNumber())
-                .name(request.getName())
-                .studentNumber(request.getStudentNumber())
-                .email(request.getEmail())
+                .admissionNumber(request.admissionNumber())
+                .name(request.name())
+                .studentNumber(request.studentNumber())
+                .email(request.email())
                 .password(hashedPassword)
                 .studentCardImage(imageUrl)
-                .universityName(request.getUniversityName())
+                .universityName(request.universityName())
                 .departmentName(department.getDepartmentName())
                 .collegeDepartmentName(collegeDepartment.getCollegeDepartmentName())
                 .affiliation(affiliation)
                 .build();
     }
+
 
     private void sendSlackNotification(Member member) {
         Slack slack = Slack.getInstance();
