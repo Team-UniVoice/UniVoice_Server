@@ -36,7 +36,6 @@ public class Affiliation extends BaseTimeEntity {
     @OneToMany(mappedBy = "affiliation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members;
 
-    // 새로운 생성자 추가
     @Builder
     public Affiliation(Role role, String affiliation) {
         this.role = role;
