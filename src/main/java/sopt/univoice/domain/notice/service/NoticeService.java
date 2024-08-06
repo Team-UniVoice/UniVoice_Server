@@ -53,7 +53,7 @@ public class NoticeService {
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         System.out.println("Member Role: " + member.getAffiliation().getRole());
 
-        String content = noticeCreateRequest.getContent();
+        String content = noticeCreateRequest.content();
         String summarizedContent = null;
         if (content.length() <= 150) {
             summarizedContent = content;
@@ -75,11 +75,11 @@ public class NoticeService {
 
         // Notice 엔티티 생성 및 저장
         Notice notice = Notice.builder()
-                .title(noticeCreateRequest.getTitle())
-                .content(noticeCreateRequest.getContent())
-                .target(noticeCreateRequest.getTarget())
-                .startTime(noticeCreateRequest.getStartTime())
-                .endTime(noticeCreateRequest.getEndTime())
+                .title(noticeCreateRequest.title())
+                .content(noticeCreateRequest.content())
+                .target(noticeCreateRequest.target())
+                .startTime(noticeCreateRequest.startTime())
+                .endTime(noticeCreateRequest.endTime())
                 .member(member)
                 .contentSummary(summarizedContent)
                 .category("공지사항")  // category 값을 '공지사항'으로 설정
@@ -88,8 +88,8 @@ public class NoticeService {
         System.out.println("Notice saved successfully with ID: " + notice.getId());
 
         // NoticeImage 엔티티 생성 및 저장
-        if (noticeCreateRequest.getNoticeImages() != null) {
-            for (MultipartFile file : noticeCreateRequest.getNoticeImages()) {
+        if (noticeCreateRequest.noticeImages() != null) {
+            for (MultipartFile file : noticeCreateRequest.noticeImages()) {
                 String fileName = storeFile(file); // 파일 저장 로직 필요.
                 System.out.println("Stored file name: " + fileName); // 디버깅 메시지 추가
                 NoticeImage noticeImage = NoticeImage.builder()

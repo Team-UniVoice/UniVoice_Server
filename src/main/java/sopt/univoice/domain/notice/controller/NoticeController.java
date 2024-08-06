@@ -22,7 +22,6 @@ public class NoticeController {
 
     @PostMapping("/create")
     public ResponseEntity<SuccessStatusResponse<Void>> createPost(@ModelAttribute NoticeCreateRequest noticeCreateRequest) {
-        System.out.println("createPost method called with request: " + noticeCreateRequest);
         noticeService.createPost(noticeCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SuccessStatusResponse.of(SuccessMessage.CREATE_NOTICE_SUCCESS, null));
