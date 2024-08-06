@@ -6,9 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sopt.univoice.domain.notice.dto.*;
-import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.service.NoticeService;
-import sopt.univoice.domain.universityData.entity.Department;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
 
@@ -59,10 +57,12 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.SAVE_CANCLE_NOTICE_SUCCESS, null));
     }
 
-    @GetMapping("/save/all")
-    public ResponseEntity<SuccessStatusResponse<List<NoticeSaveDTO>>> getSaveNoticeByUser() {
 
-        List<NoticeSaveDTO> notices = noticeService.getSaveNoticeByUser();
+
+    @GetMapping("/save/all")
+    public ResponseEntity<SuccessStatusResponse<List<NoticeSaveListByUser>>> getSaveNoticeByUser() {
+
+        List<NoticeSaveListByUser> notices = noticeService.getSaveNoticeByUser();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.SAVE_ALL_NOTICE_SUCCESS, notices));
     }
@@ -82,6 +82,12 @@ public class NoticeController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SuccessStatusResponse.of(SuccessMessage.VIEW_CHECK_NOTICE_SUCCESS, null));
     }
+
+
+    // dto 체크 시작
+    // dto 체크 시작
+    // dto 체크 시작
+    // dto 체크 시작
 
     @GetMapping("/quickhead")
     public ResponseEntity<SuccessStatusResponse<Object>> quickhead() {
@@ -127,9 +133,9 @@ public class NoticeController {
     }
 
     @PostMapping ("/quick")
-    public ResponseEntity<SuccessStatusResponse<List<QuickQueryNoticeDTO>>> getQuickNoticeByUserUniversity(@RequestBody AffiliationRequestDTO request) {
+    public ResponseEntity<SuccessStatusResponse<List<QuickNoticeListResponse>>> getQuickNoticeByUserUniversity(@RequestBody AffiliationRequestDTO request) {
 
-        List<QuickQueryNoticeDTO> response = noticeService.getQuickNoticeByUserUniversity(request.getAffiliation());
+        List<QuickNoticeListResponse> response = noticeService.getQuickNoticeByUserUniversity(request.getAffiliation());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_QUICK_NOTICE_SUCCESS, response));
     }

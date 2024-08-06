@@ -24,8 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.time.DayOfWeek;
 
 
@@ -82,7 +80,7 @@ public class NoticeService {
                 .endTime(noticeCreateRequest.endTime())
                 .member(member)
                 .contentSummary(summarizedContent)
-                .category("공지사항")  // category 값을 '공지사항'으로 설정
+                .category("공지사항")
                 .build();
         noticeRepository.save(notice);
         System.out.println("Notice saved successfully with ID: " + notice.getId());
@@ -115,6 +113,12 @@ public class NoticeService {
             noticeViewRepository.save(noticeView);
         }
     }
+
+
+
+
+
+
 
     private String storeFile(MultipartFile file) {
         try {
@@ -202,49 +206,19 @@ public class NoticeService {
         saveNoticeRepository.delete(saveNotice);
     }
 
-    @Transactional(readOnly = true)
-    public List<NoticeSaveDTO> getSaveNoticeByUser() {
-        Long memberId = principalHandler.getUserIdFromPrincipal();
-
-        Member member = authRepository.findById(memberId)
-                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
-
-        List<SaveNotice> saveNotices = saveNoticeRepository.findByMember(member);
-
-        return saveNotices.stream()
-                .map(saveNotice -> {
-                    Notice notice = saveNotice.getNotice();
-                    String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
-                    return new NoticeSaveDTO(
-                            notice.getId(),
-                            notice.getTitle(),
-                            notice.getViewCount(),
-                            notice.getNoticeLike(),
-                            notice.getCategory(),
-                            notice.getStartTime(),
-                            notice.getEndTime(),
-                            saveNotice.getCreatedAt(), // 추가된 부분
-                            image
-                    );
-                }).sorted(Comparator.comparing(NoticeSaveDTO::getCreatedAt).reversed())
-                .collect(Collectors.toList());
-    }
 
     @Transactional
     public void viewCount(Long noticeId) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
-        // member와 notice를 가져옵니다.
         Member member = authRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
 
-        // viewCount를 1 증가시킵니다.
         notice.setViewCount(notice.getViewCount() + 1);
         noticeRepository.save(notice);
 
-        // NoticeView에서 해당 member와 notice의 데이터를 찾아 readAt을 true로 설정합니다.
         NoticeView noticeView = noticeViewRepository.findByNoticeAndMember(notice, member)
                 .orElseThrow(() -> new RuntimeException("조회 기록이 존재하지 않습니다."));
         noticeView.setReadAt(true);
@@ -257,27 +231,57 @@ public class NoticeService {
     public void viewCheck(Long noticeId) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
-        // member와 notice를 가져옵니다.
         Member member = authRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new RuntimeException("공지사항이 존재하지 않습니다."));
 
-        // viewCount를 1 증가시킵니다.
-
         noticeRepository.save(notice);
 
-        // NoticeView에서 해당 member와 notice의 데이터를 찾아 readAt을 true로 설정합니다.
         NoticeView noticeView = noticeViewRepository.findByNoticeAndMember(notice, member)
                 .orElseThrow(() -> new RuntimeException("조회 기록이 존재하지 않습니다."));
         noticeView.setReadAt(true);
         noticeViewRepository.save(noticeView);
     }
 
+    // dto 체크 시작
+    // dto 체크 시작
+    // dto 체크 시작
+    // dto 체크 시작
+    @Transactional(readOnly = true)
+    public List<NoticeSaveListByUser> getSaveNoticeByUser() {
+        Long memberId = principalHandler.getUserIdFromPrincipal();
+
+        Member member = authRepository.findById(memberId)
+                .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
+
+        List<SaveNotice> saveNotices = saveNoticeRepository.findByMember(member);
+
+        return saveNotices.stream()
+                .map(saveNotice -> {
+                    Notice notice = saveNotice.getNotice();
+                    String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
+                    return new NoticeSaveListByUser(
+                            notice.getId(),
+                            notice.getTitle(),
+                            notice.getViewCount(),
+                            notice.getNoticeLike(),
+                            notice.getCategory(),
+                            notice.getStartTime(),
+                            notice.getEndTime(),
+                            saveNotice.getCreatedAt(), // 추가된 부분
+                            image
+                    );
+                }).sorted(Comparator.comparing(NoticeSaveListByUser::createdAt).reversed())
+                .collect(Collectors.toList());
+    }
+
+
+
 
     // 퀵 스캔  안읽은 공지 리스트  가져오기
     @Transactional
-    public List<QuickQueryNoticeDTO> getQuickNoticeByUserUniversity(String affiliation) {
+    public List<QuickNoticeListResponse> getQuickNoticeByUserUniversity(String affiliation) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
         Member member = authRepository.findById(memberId)
@@ -301,7 +305,7 @@ public class NoticeService {
         List<Notice> filteredNotices = notices.stream()
                 .filter(notice -> notice.getNoticeViews().stream()
                         .anyMatch(noticeView -> noticeView.getMember().getId().equals(memberId) && !noticeView.isReadAt()))
-                .sorted(Comparator.comparing(Notice::getCreatedAt).reversed()) // 역순 정렬
+                .sorted(Comparator.comparing(Notice::getCreatedAt).reversed())
                 .collect(Collectors.toList());
 
         return filteredNotices.stream().map(notice -> {
@@ -354,7 +358,7 @@ public class NoticeService {
             // saveCheck 로직 추가
             boolean saveCheck = saveNoticeRepository.existsByMemberIdAndNoticeId(memberId, notice.getId());
 
-            return new QuickQueryNoticeDTO(
+            return new QuickNoticeListResponse(
                     notice.getId(),
                     notice.getStartTime(),
                     notice.getEndTime(),

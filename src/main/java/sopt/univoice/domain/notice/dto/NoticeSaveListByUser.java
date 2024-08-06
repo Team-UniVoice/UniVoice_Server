@@ -1,11 +1,8 @@
 package sopt.univoice.domain.notice.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.time.LocalDateTime;
 
-public record NoticeSaveDTO(
+public record NoticeSaveListByUser(
         Long id,
         String title,
         Long viewCount,
