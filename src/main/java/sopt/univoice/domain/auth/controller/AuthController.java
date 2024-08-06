@@ -10,7 +10,6 @@ import sopt.univoice.domain.auth.dto.MemberCreateRequest;
 import sopt.univoice.domain.auth.dto.MemberSignInRequest;
 import sopt.univoice.domain.auth.dto.UserLoginResponse;
 import sopt.univoice.domain.auth.service.AuthService;
-import sopt.univoice.domain.universityData.dto.UniversityNameRequest;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
 import sopt.univoice.infra.common.exception.message.BusinessException;

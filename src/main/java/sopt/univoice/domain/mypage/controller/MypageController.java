@@ -8,11 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sopt.univoice.domain.mypage.dto.response.GetMypageReponseDto;
 import sopt.univoice.domain.mypage.service.MypageService;
-import sopt.univoice.domain.notice.dto.NoticeSaveDTO;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/mypage")

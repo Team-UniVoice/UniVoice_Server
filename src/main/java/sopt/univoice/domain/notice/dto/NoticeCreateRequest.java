@@ -9,24 +9,14 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Setter
-@Getter
-@NoArgsConstructor
-//@AllArgsConstructor
-public class NoticeCreateRequest {
-
-
-    private String title;
-
-    private String content;
-
-    private String target;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime startTime;
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-    private LocalDateTime endTime;
-
-    private List<MultipartFile> noticeImages;
-
+public record NoticeCreateRequest(
+        String title,
+        String content,
+        String target,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        LocalDateTime startTime,
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+        LocalDateTime endTime,
+        List<MultipartFile> noticeImages
+) {
 }

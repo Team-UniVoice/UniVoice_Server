@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import sopt.univoice.domain.notice.dto.*;
 import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.service.NoticeService;
-import sopt.univoice.domain.universityData.entity.Department;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
 
@@ -22,7 +21,6 @@ public class NoticeController {
 
     @PostMapping("/create")
     public ResponseEntity<SuccessStatusResponse<Void>> createPost(@ModelAttribute NoticeCreateRequest noticeCreateRequest) {
-        System.out.println("createPost method called with request: " + noticeCreateRequest);
         noticeService.createPost(noticeCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(SuccessStatusResponse.of(SuccessMessage.CREATE_NOTICE_SUCCESS, null));
@@ -60,10 +58,12 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.SAVE_CANCLE_NOTICE_SUCCESS, null));
     }
 
-    @GetMapping("/save/all")
-    public ResponseEntity<SuccessStatusResponse<List<NoticeSaveDTO>>> getSaveNoticeByUser() {
 
-        List<NoticeSaveDTO> notices = noticeService.getSaveNoticeByUser();
+
+    @GetMapping("/save/all")
+    public ResponseEntity<SuccessStatusResponse<List<NoticeSaveListByUserResponse>>> getSaveNoticeByUser() {
+
+        List<NoticeSaveListByUserResponse> notices = noticeService.getSaveNoticeByUser();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.SAVE_ALL_NOTICE_SUCCESS, notices));
     }
@@ -84,9 +84,15 @@ public class NoticeController {
                 .body(SuccessStatusResponse.of(SuccessMessage.VIEW_CHECK_NOTICE_SUCCESS, null));
     }
 
+
+    // dto 체크 시작
+    // dto 체크 시작
+    // dto 체크 시작
+    // dto 체크 시작
+
     @GetMapping("/quickhead")
     public ResponseEntity<SuccessStatusResponse<Object>> quickhead() {
-        QuickScanDTO response = noticeService.quickhead();
+        QuickScanStoryHeadResponse response = noticeService.quickhead();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_QUCIK_HEAD_SUCCESS, response));
     }
@@ -102,7 +108,7 @@ public class NoticeController {
 
     @GetMapping("/university")
     public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity() {
-        List<NoticeDTO> response = noticeService.getUniversityNoticeByUserUniversity();
+        List<NoticeResponseDTO> response = noticeService.getUniversityNoticeByUserUniversity();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_UNIVERSITY_NOTICE_SUCCESS, response));
     }
@@ -128,17 +134,17 @@ public class NoticeController {
     }
 
     @PostMapping ("/quick")
-    public ResponseEntity<SuccessStatusResponse<List<QuickQueryNoticeDTO>>> getQuickNoticeByUserUniversity(@RequestBody AffiliationRequestDTO request) {
+    public ResponseEntity<SuccessStatusResponse<List<QuickNoticeListResponse>>> getQuickNoticeByUserUniversity(@RequestBody AffiliationRequest request) {
 
-        List<QuickQueryNoticeDTO> response = noticeService.getQuickNoticeByUserUniversity(request.getAffiliation());
+        List<QuickNoticeListResponse> response = noticeService.getQuickNoticeByUserUniversity(request.affiliation());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_QUICK_NOTICE_SUCCESS, response));
     }
 
 
     @GetMapping("/{noticeId}")
-    public ResponseEntity<SuccessStatusResponse<NoticeDetailResponseDTO>> getNoticeById(@PathVariable Long noticeId) {
-        NoticeDetailResponseDTO response = noticeService.getNoticeById(noticeId);
+    public ResponseEntity<SuccessStatusResponse<Notice>> getNoticeById(@PathVariable Long noticeId) {
+        Notice response = noticeService.getNoticeById(noticeId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_Detail_NOTICE_SUCCESS, response));
     }

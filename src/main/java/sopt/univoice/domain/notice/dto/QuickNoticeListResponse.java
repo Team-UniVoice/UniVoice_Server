@@ -1,21 +1,20 @@
 package sopt.univoice.domain.notice.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 
-public record NoticeResponseDTO(
+public record QuickNoticeListResponse(
         Long id,
         LocalDateTime startTime,
         LocalDateTime endTime,
         String title,
+        String target,
+        String writeAffiliation,
+        String contentSummary,
         Long likeCount,
         Long viewCount,
         String category,
         LocalDateTime createdAt,
-        String image
+        String logoImage,
+        Boolean saveCheck
 ) {
 }
