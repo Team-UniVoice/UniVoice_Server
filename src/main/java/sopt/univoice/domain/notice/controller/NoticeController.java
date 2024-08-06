@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sopt.univoice.domain.notice.dto.*;
+import sopt.univoice.domain.notice.entity.Notice;
 import sopt.univoice.domain.notice.service.NoticeService;
 import sopt.univoice.infra.common.dto.SuccessMessage;
 import sopt.univoice.infra.common.dto.SuccessStatusResponse;
@@ -142,8 +143,8 @@ public class NoticeController {
 
 
     @GetMapping("/{noticeId}")
-    public ResponseEntity<SuccessStatusResponse<NoticeDetailResponse>> getNoticeById(@PathVariable Long noticeId) {
-        NoticeDetailResponse response = noticeService.getNoticeById(noticeId);
+    public ResponseEntity<SuccessStatusResponse<Notice>> getNoticeById(@PathVariable Long noticeId) {
+        Notice response = noticeService.getNoticeById(noticeId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_Detail_NOTICE_SUCCESS, response));
     }
