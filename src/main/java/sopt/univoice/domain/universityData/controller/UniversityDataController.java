@@ -37,7 +37,7 @@ public class UniversityDataController {
 
     @PostMapping("/department")
     public ResponseEntity<SuccessStatusResponse<List<String>>> getDepartmentNamesByUniversity(@RequestBody UniversityNameRequest universityNameRequest) {
-        List<String> departmentNames = universityDataService.getDepartmentNamesByUniversity(universityNameRequest.getUniversityName());
+        List<String> departmentNames = universityDataService.getDepartmentNamesByUniversity(universityNameRequest.universityName());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.DEPARTMENT_GET_SUCCESS, departmentNames));
     }
