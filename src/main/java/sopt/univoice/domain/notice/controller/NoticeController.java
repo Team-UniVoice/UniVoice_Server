@@ -60,9 +60,9 @@ public class NoticeController {
 
 
     @GetMapping("/save/all")
-    public ResponseEntity<SuccessStatusResponse<List<NoticeSaveListByUser>>> getSaveNoticeByUser() {
+    public ResponseEntity<SuccessStatusResponse<List<NoticeSaveListByUserResponse>>> getSaveNoticeByUser() {
 
-        List<NoticeSaveListByUser> notices = noticeService.getSaveNoticeByUser();
+        List<NoticeSaveListByUserResponse> notices = noticeService.getSaveNoticeByUser();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.SAVE_ALL_NOTICE_SUCCESS, notices));
     }
@@ -91,7 +91,7 @@ public class NoticeController {
 
     @GetMapping("/quickhead")
     public ResponseEntity<SuccessStatusResponse<Object>> quickhead() {
-        QuickScanDTO response = noticeService.quickhead();
+        QuickScanStoryHeadResponse response = noticeService.quickhead();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_QUCIK_HEAD_SUCCESS, response));
     }
@@ -133,9 +133,9 @@ public class NoticeController {
     }
 
     @PostMapping ("/quick")
-    public ResponseEntity<SuccessStatusResponse<List<QuickNoticeListResponse>>> getQuickNoticeByUserUniversity(@RequestBody AffiliationRequestDTO request) {
+    public ResponseEntity<SuccessStatusResponse<List<QuickNoticeListResponse>>> getQuickNoticeByUserUniversity(@RequestBody AffiliationRequest request) {
 
-        List<QuickNoticeListResponse> response = noticeService.getQuickNoticeByUserUniversity(request.getAffiliation());
+        List<QuickNoticeListResponse> response = noticeService.getQuickNoticeByUserUniversity(request.affiliation());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_QUICK_NOTICE_SUCCESS, response));
     }

@@ -249,7 +249,7 @@ public class NoticeService {
     // dto 체크 시작
     // dto 체크 시작
     @Transactional(readOnly = true)
-    public List<NoticeSaveListByUser> getSaveNoticeByUser() {
+    public List<NoticeSaveListByUserResponse> getSaveNoticeByUser() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
         Member member = authRepository.findById(memberId)
@@ -261,7 +261,7 @@ public class NoticeService {
                 .map(saveNotice -> {
                     Notice notice = saveNotice.getNotice();
                     String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage();
-                    return new NoticeSaveListByUser(
+                    return new NoticeSaveListByUserResponse(
                             notice.getId(),
                             notice.getTitle(),
                             notice.getViewCount(),
@@ -272,7 +272,7 @@ public class NoticeService {
                             saveNotice.getCreatedAt(), // 추가된 부분
                             image
                     );
-                }).sorted(Comparator.comparing(NoticeSaveListByUser::createdAt).reversed())
+                }).sorted(Comparator.comparing(NoticeSaveListByUserResponse::createdAt).reversed())
                 .collect(Collectors.toList());
     }
 
@@ -379,7 +379,7 @@ public class NoticeService {
 
     // 퀵 스캔 헤드 가져오기
     @Transactional
-    public QuickScanDTO quickhead() {
+    public QuickScanStoryHeadResponse quickhead() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
         Member member = authRepository.findById(memberId)
                 .orElseThrow(() -> new RuntimeException("회원이 존재하지 않습니다."));
@@ -462,7 +462,7 @@ public class NoticeService {
             }
         }
 
-        QuickScanDTO quickScans = new QuickScanDTO(
+        QuickScanStoryHeadResponse quickScans = new QuickScanStoryHeadResponse(
                 universityName + " 총학생회", universityNameCount, universityLogoImage,
                 collegeDepartmentName + " 학생회", collegeDepartmentCount, collegeDepartmentLogoImage,
                 departmentName + " 학생회", departmentCount, departmentLogoImage

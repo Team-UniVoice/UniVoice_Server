@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetAllNoticesResponseDTO {
-    private QuickScanDTO quickScans;
+    private QuickScanStoryHeadResponse quickScans;
     private List<NoticeDTO> notices;
 }
 

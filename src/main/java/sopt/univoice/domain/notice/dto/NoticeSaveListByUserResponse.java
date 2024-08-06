@@ -2,7 +2,7 @@ package sopt.univoice.domain.notice.dto;
 
 import java.time.LocalDateTime;
 
-public record NoticeSaveListByUser(
+public record NoticeSaveListByUserResponse(
         Long id,
         String title,
         Long viewCount,
