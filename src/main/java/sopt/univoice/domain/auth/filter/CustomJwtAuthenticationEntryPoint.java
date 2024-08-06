@@ -37,7 +37,7 @@ public class CustomJwtAuthenticationEntryPoint implements AuthenticationEntryPoi
                 ErrorResponse.of(
                         ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION.getStatus(),
                         ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION.getMessage(),
-                        null // 추가된 필드
+                        null
                 )
         ));
     }

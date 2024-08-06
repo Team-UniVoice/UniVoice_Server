@@ -50,7 +50,8 @@ public class AuthService {
 
     @Value("${slack.webhook-url}")
     private String webhookUrl;
-    private static final String S3_BUCKET_URL = "https://uni-voice-bucket.s3.ap-northeast-2.amazonaws.com/";
+    @Value("${aws-property.s3-bucket-url}")
+    private String s3BucketUrl;
 
     private final AuthRepository authRepository;
     private final S3Service s3Service;

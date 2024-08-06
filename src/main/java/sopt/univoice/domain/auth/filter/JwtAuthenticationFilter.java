@@ -70,9 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             System.out.println("Exception during token validation: " + exception.getMessage());
             throw new UnauthorizedException(ErrorMessage.JWT_UNAUTHORIZED_EXCEPTION);
         }
-        System.out.println("ㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ");
         filterChain.doFilter(request, response);
-        System.out.println("ㅇㅇㅇㅇ");
     }
 
 
