@@ -520,7 +520,7 @@ public class NoticeService {
     }
 
     @Transactional
-    public List<NoticeDTO> getUniversityNoticeByUserUniversity() {
+    public List<NoticeResponseDTO> getUniversityNoticeByUserUniversity() {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
         Member member = authRepository.findById(memberId)
@@ -533,10 +533,10 @@ public class NoticeService {
         // 최신순 정렬 (즉, 제일 최근에 올린 공지가 맨 위, 전에 올렸던 공지는 아래)
         universityNotices.sort(Comparator.comparing(Notice::getCreatedAt).reversed());
 
-        List<NoticeDTO> noticeResponseDTOs = new ArrayList<>();
+        List<NoticeResponseDTO> noticeResponseDTOs = new ArrayList<>();
         for (Notice notice : universityNotices) {
             String image = notice.getNoticeImages().isEmpty() ? null : notice.getNoticeImages().get(0).getNoticeImage(); // 이미지 리스트 중 0번째 인덱스 값 가져옴, 비어있으면 null 반환
-            NoticeDTO noticeDTO = new NoticeDTO(
+            NoticeResponseDTO noticeDTO = new NoticeResponseDTO(
                     notice.getId(),
                     notice.getStartTime(),
                     notice.getEndTime(),
@@ -619,7 +619,7 @@ public class NoticeService {
     }
 
     @Transactional(readOnly = true)
-    public NoticeDetailResponseDTO getNoticeById(Long noticeId) {
+    public NoticeDetailResponse getNoticeById(Long noticeId) {
         Long memberId = principalHandler.getUserIdFromPrincipal();
 
         Notice notice = noticeRepository.findById(noticeId)
@@ -644,7 +644,7 @@ public class NoticeService {
         DayOfWeek dayOfWeekEnum = notice.getCreatedAt().getDayOfWeek();
         String dayOfWeek = convertDayOfWeekToKorean(dayOfWeekEnum);
 
-        return new NoticeDetailResponseDTO(
+        return new NoticeDetailResponse(
                 notice.getId(),
                 notice.getTitle(),
                 notice.getContent(),

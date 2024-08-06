@@ -107,7 +107,7 @@ public class NoticeController {
 
     @GetMapping("/university")
     public ResponseEntity<SuccessStatusResponse<Object>> getUniversityNoticeByUserUniversity() {
-        List<NoticeDTO> response = noticeService.getUniversityNoticeByUserUniversity();
+        List<NoticeResponseDTO> response = noticeService.getUniversityNoticeByUserUniversity();
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_ALL_UNIVERSITY_NOTICE_SUCCESS, response));
     }
@@ -142,8 +142,8 @@ public class NoticeController {
 
 
     @GetMapping("/{noticeId}")
-    public ResponseEntity<SuccessStatusResponse<NoticeDetailResponseDTO>> getNoticeById(@PathVariable Long noticeId) {
-        NoticeDetailResponseDTO response = noticeService.getNoticeById(noticeId);
+    public ResponseEntity<SuccessStatusResponse<NoticeDetailResponse>> getNoticeById(@PathVariable Long noticeId) {
+        NoticeDetailResponse response = noticeService.getNoticeById(noticeId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(SuccessStatusResponse.of(SuccessMessage.GET_Detail_NOTICE_SUCCESS, response));
     }
