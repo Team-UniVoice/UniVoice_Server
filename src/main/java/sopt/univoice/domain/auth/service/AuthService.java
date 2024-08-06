@@ -81,10 +81,10 @@ public class AuthService {
 
     @Transactional
     public UserLoginResponse logineMember(MemberSignInRequest memberSignInRequest) {
-        Member member = authRepository.findByEmail(memberSignInRequest.getEmail())
+        Member member = authRepository.findByEmail(memberSignInRequest.email())
                 .orElseThrow(() -> new UnauthorizedException(ErrorMessage.JWT_LOGIN_PASSWORD_EXCEPTION));
 
-        if (!passwordEncoder.matches(memberSignInRequest.getPassword(), member.getPassword())) {
+        if (!passwordEncoder.matches(memberSignInRequest.password(), member.getPassword())) {
             throw new UnauthorizedException(ErrorMessage.JWT_LOGIN_PASSWORD_EXCEPTION);
         }
 
@@ -99,7 +99,7 @@ public class AuthService {
 
 
     public boolean isDuplicateEmail(CheckEmailRequest checkEmailRequest) {
-        return authRepository.existsByEmail(checkEmailRequest.getEmail());
+        return authRepository.existsByEmail(checkEmailRequest.email());
     }
 
     private String uploadStudentCardImage(MultipartFile studentCardImage) {
