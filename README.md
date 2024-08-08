@@ -10,7 +10,7 @@
 
 
 ## 🌰Contributors
-|<img src="https://github.com/Team-UniVoice/UniVoice_Server/assets/137388764/d0d09b19-3948-4559-911a-902e54d0ff82" width="250" /> | <img src="https://github.com/SOPT-33RD-APP-NAVERPAY/NaverPay-Server/assets/80024278/f38b7a70-1bf3-48b6-ad8a-05a1deb165be" width="250"/> |
+|<img src="https://github.com/user-attachments/assets/511f23d2-21a8-453a-8657-45cf08ca7cbe" width="250" /> | <img src="https://github.com/user-attachments/assets/9c35bbef-bd33-4e23-9e15-5f3f62a19f05" width="250"/> |
 |:---------:|:---------:|
 |[최영철](https://github.com/softmoca)|[현예진](https://github.com/eeddiinn)|
 | **[👑 Team Leader]** </br> 프로젝트 초기 세팅(EC2 , RDS)</br>ERD 설계 </br> API 개발 | **[🤖 Team Member]** </br>API 개발 |
